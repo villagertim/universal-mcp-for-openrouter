@@ -1,14 +1,14 @@
 {
-  "_comment": "Antigravity profile: Built-in code intelligence, persistent memory (KIs), and vision. Most tools disabled.",
-  "_tested": true,
-  "_status": "Production-verified by the project maintainer.",
+  "_comment": "Claude Code profile: Has file search + grep, but no persistent memory or native vision.",
+  "_tested": false,
+  "_status": "Community-contributed — not tested by the maintainer. See PROFILES.md for details.",
   "chat_completion": true,
   "chat_with_preset": true,
   "list_models": true,
   "get_balance": true,
   "get_key_info": true,
   "recommend_model": true,
-  "vision_analyze": false,
+  "vision_analyze": true,
   "optimize_prompt": true,
   "get_session_usage": true,
   "set_budget": true,
@@ -16,10 +16,10 @@
   "index_project": false,
   "search_symbols": false,
   "correlate_errors": true,
-  "pin_context": false,
-  "retrieve_context": false,
-  "clear_context": false,
+  "pin_context": true,
+  "retrieve_context": true,
+  "clear_context": true,
   "reindex_project": false,
   "semantic_code_search": false,
-  "dependency_graph": false
+  "dependency_graph": true
 }
