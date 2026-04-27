@@ -1,8 +1,11 @@
 {
-  "name": "openrouter-mcp",
+  "name": "universal-mcp-for-openrouter",
   "version": "1.2.0",
-  "description": "MCP server for OpenRouter API with config-driven tool management",
+  "description": "Universal MCP server for OpenRouter API with config-driven tool management, budget controls, and cost-aware routing.",
   "main": "index.js",
+  "bin": {
+    "universal-mcp-for-openrouter": "./build/index.js"
+  },
   "type": "module",
   "engines": {
     "node": ">=18.0.0"
@@ -14,9 +17,25 @@
     "dev": "ts-node src/index.ts",
     "test": "vitest run"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "mcp",
+    "openrouter",
+    "ai",
+    "agent",
+    "llm",
+    "claude",
+    "cursor"
+  ],
+  "author": "Timothy Reid",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/[username]/universal-mcp-for-openrouter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/[username]/universal-mcp-for-openrouter/issues"
+  },
+  "homepage": "https://github.com/[username]/universal-mcp-for-openrouter#readme",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
     "axios": "^1.15.2",

@@ -27,18 +27,9 @@ Done (Apr 2026). Renamed to `USER_MANUAL.md` and stamped as Revision 0.9.
 
 ---
 
-### 🔴 #3 — Update `package.json` Metadata
+### ✅ #3 — Update `package.json` Metadata
 
-The following fields need to be finalized:
-
-| Field | Current Value | Update To |
-|---|---|---|
-| `name` | `"openrouter-mcp"` | `"universal-mcp-for-openrouter"` (or chosen npm name) |
-| `description` | `"MCP server for OpenRouter API with config-driven tool management"` | Update to match project branding |
-| `author` | `""` (empty) | `"Timothy Reid"` |
-| `repository` | (missing) | Add repository URL object |
-| `homepage` | (missing) | Add GitHub URL |
-| `bugs` | (missing) | Add issues URL |
+Done (Apr 2026). Updated `name` to `universal-mcp-for-openrouter` and added all missing metadata fields.
 
 ---
 

@@ -606,13 +606,13 @@ Before you begin, you need:
 Open your terminal and run:
 
 ```bash
-npm install -g openrouter-mcp-server
+npm install -g universal-mcp-for-openrouter
 ```
 
 **Step 2: Verify installation**
 
 ```bash
-openrouter-mcp --version
+universal-mcp-for-openrouter --version
 ```
 
 You should see a version number. If you see an error, ensure Node.js is installed and your npm global directory is in your PATH.
@@ -669,7 +669,7 @@ The exact configuration depends on which MCP client you are using. The general p
 {
   "mcpServers": {
     "openrouter": {
-      "command": "openrouter-mcp",
+      "command": "universal-mcp-for-openrouter",
       "args": ["--profile", "antigravity"],
       "env": {
         "OPENROUTER_API_KEY": "${OPENROUTER_API_KEY}"
@@ -685,7 +685,7 @@ The exact configuration depends on which MCP client you are using. The general p
 {
   "mcpServers": {
     "openrouter": {
-      "command": "openrouter-mcp",
+      "command": "universal-mcp-for-openrouter",
       "args": ["--profile", "claude-code"],
       "env": {
         "OPENROUTER_API_KEY": "${OPENROUTER_API_KEY}"
@@ -701,7 +701,7 @@ The exact configuration depends on which MCP client you are using. The general p
 {
   "servers": {
     "openrouter": {
-      "command": "openrouter-mcp",
+      "command": "universal-mcp-for-openrouter",
       "args": ["--profile", "cursor"]
     }
   }
@@ -713,7 +713,7 @@ The exact configuration depends on which MCP client you are using. The general p
 {
   "mcpServers": {
     "openrouter": {
-      "command": "openrouter-mcp",
+      "command": "universal-mcp-for-openrouter",
       "args": ["--profile", "windsurf"]
     }
   }
@@ -725,7 +725,7 @@ The exact configuration depends on which MCP client you are using. The general p
 {
   "mcpServers": {
     "openrouter": {
-      "command": "openrouter-mcp",
+      "command": "universal-mcp-for-openrouter",
       "args": ["--profile", "generic"]
     }
   }
