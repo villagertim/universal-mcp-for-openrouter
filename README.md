@@ -67,6 +67,26 @@ In your `mcp_config.json`:
 
 ---
 
+## Security & Cost Control
+
+> [!CAUTION]
+> **NOTICE TO USERS: Defense-in-Depth Budgeting**
+> 
+> The Universal MCP for OpenRouter provides powerful application-level budget controls (via the `set_budget` tool) and automatic circuit breakers. However, you should treat these tools as **just one line of defense** specifically tailored for application development and dynamic agentic workflows.
+> 
+> **You must ALWAYS implement infrastructure-level limits directly through OpenRouter.** 
+> 
+> If your IDE crashes, an agent enters an infinite loop that bypasses the MCP, or your API key is somehow exposed, the MCP's circuit breakers cannot protect you. To ensure true financial safety, follow these OpenRouter best practices:
+> 
+> 1. **Use Unique Keys:** Generate a unique OpenRouter API key specifically for this MCP server. Do not reuse a master key.
+> 2. **Set Hard Key Limits:** In your OpenRouter Dashboard (Settings -> Keys), apply a strict USD spending limit to this specific key.
+> 3. **Set Reset Frequencies:** Configure the key to reset daily or weekly rather than leaving it uncapped.
+> 4. **Base Account Limits:** Ensure your base OpenRouter account has a global maximum spending limit configured.
+> 
+> Use OpenRouter's native limits to protect your wallet, and use the Universal MCP's budget tools to manage your agent's behavior.
+
+---
+
 ## Usage Guide
 
 ### Basic Completions
