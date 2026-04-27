@@ -170,7 +170,7 @@ An **API key** is a long string of characters that proves to a service that you 
 
 **Example of what an API key looks like:**
 ```
-PLACEHOLDER_API_KEY
+sk-or-v1-PLACEHOLDER
 ```
 
 Your OpenRouter API key is what allows the MCP server to make requests on your behalf. **Treat it like a password** — never share it, never put it in code you commit to a public repository.
@@ -186,7 +186,7 @@ An **environment variable** is a piece of information stored in your computer's 
 Imagine your computer has a secret drawer built into its desk. You put a note in the drawer that says:
 
 ```
-OPENROUTER_API_KEY = sk-or-v1-a8f3c2e1b9d4f7a2c5e8b1d4f7a2c5e8b1d4f7a2
+OPENROUTER_API_KEY = sk-or-v1-PLACEHOLDER
 ```
 
 When the MCP server starts up, it opens that drawer, reads the note, and uses the key. The key never appears in your code. If someone steals your code, they cannot find your key because it lives in the drawer, not in the code.
