@@ -13,7 +13,7 @@ All of the following files contain placeholders or generic references that must 
 | File | Line | Current Value | Update To |
 |---|---|---|---|
 | `LICENSE` | 4 | `[TBD: GitHub repository URL]` | `https://github.com/[username]/universal-mcp-for-openrouter` |
-| `USER_MANUAL_DRAFT.md` | 2140 | `refer to the project repository` | Add clickable link to GitHub URL |
+| `USER_MANUAL.md` | 2140 | `refer to the project repository` | Add clickable link to GitHub URL |
 | `package.json` | — | (missing `repository` field) | Add `"repository": { "type": "git", "url": "..." }` |
 | `package.json` | — | (missing `homepage` field) | Add `"homepage": "..."` |
 | `package.json` | — | (missing `bugs` field) | Add `"bugs": { "url": ".../issues" }` |
@@ -21,9 +21,9 @@ All of the following files contain placeholders or generic references that must 
 
 ---
 
-### 🔴 #2 — Rename `USER_MANUAL_DRAFT.md` to `USER_MANUAL.md`
+### ✅ #2 — Rename `USER_MANUAL_DRAFT.md` to `USER_MANUAL.md`
 
-Final review must be completed before committing the manual as the official version.
+Done (Apr 2026). Renamed to `USER_MANUAL.md` and stamped as Revision 0.9.
 
 ---
 
@@ -78,7 +78,7 @@ Items that should be resolved before announcing the project publicly.
 | # | Item | Status | Notes |
 |---|---|---|---|
 | 9 | **Fix 3 failing test mocks** | ✅ Done (Apr 2026) | Fixed mock paths in context, budget, and code_intelligence tests. |
-| 10 | **Rename `USER_MANUAL_DRAFT.md` → `USER_MANUAL.md`** | 🔴 Blocking | Same as item #2 — final review must be completed first. |
+| 10 | **Rename `USER_MANUAL_DRAFT.md` → `USER_MANUAL.md`** | ✅ Done (Apr 2026) | Renamed to USER_MANUAL.md and stamped as Revision 0.9. |
 | 11 | **Update preset model IDs in `src/config.ts`** | ✅ Done (Apr 2026) | Replaced 2024 models with 2026 models documented in manual (Claude Opus 4.7, GPT-5.5, Gemini 3.1 Pro, etc.). |
 | 12 | **Publish to npm** | 🟡 Recommended | Needed so users can `npx` install without cloning. Decide on package name: `universal-mcp-for-openrouter` or similar. |
 
