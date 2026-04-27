@@ -79,7 +79,7 @@ Items that should be resolved before announcing the project publicly.
 |---|---|---|---|
 | 9 | **Fix 3 failing test mocks** | ✅ Done (Apr 2026) | Fixed mock paths in context, budget, and code_intelligence tests. |
 | 10 | **Rename `USER_MANUAL_DRAFT.md` → `USER_MANUAL.md`** | 🔴 Blocking | Same as item #2 — final review must be completed first. |
-| 11 | **Update preset model IDs in `src/config.ts`** | 🟡 Recommended | Preset arrays still reference 2024-era model IDs (e.g., `claude-3.5-sonnet`). Should match the 2026 models documented in the manual. |
+| 11 | **Update preset model IDs in `src/config.ts`** | ✅ Done (Apr 2026) | Replaced 2024 models with 2026 models documented in manual (Claude Opus 4.7, GPT-5.5, Gemini 3.1 Pro, etc.). |
 | 12 | **Publish to npm** | 🟡 Recommended | Needed so users can `npx` install without cloning. Decide on package name: `universal-mcp-for-openrouter` or similar. |
 
 ---

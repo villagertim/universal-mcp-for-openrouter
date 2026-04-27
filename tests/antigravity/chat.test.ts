@@ -24,8 +24,8 @@ describe("Chat & Model Intelligence (#1)", () => {
       circuitBreakerMap: new Map(),
       tokenBucketMap: new Map(),
       pricingCache: {
-        "anthropic/claude-3.5-sonnet": { prompt: "0.000003", completion: "0.000015" },
-        "meta-llama/llama-3.1-8b-instruct": { prompt: "0.000001", completion: "0.000001" }
+        "anthropic/claude-sonnet-4.6": { prompt: "0.000003", completion: "0.000015" },
+        "openai/gpt-5.4-nano": { prompt: "0.000001", completion: "0.000001" }
       },
     };
   });
@@ -35,14 +35,14 @@ describe("Chat & Model Intelligence (#1)", () => {
     
     mockAxios.post.mockResolvedValue({
       data: {
-        model: "anthropic/claude-3.5-sonnet",
+        model: "anthropic/claude-sonnet-4.6",
         choices: [{ message: { content: "Hello from Claude!" } }],
         usage: { prompt_tokens: 10, completion_tokens: 20 }
       }
     });
 
     const result = await handlers.chat_completion({
-      model: "anthropic/claude-3.5-sonnet",
+      model: "anthropic/claude-sonnet-4.6",
       prompt: "Hi"
     });
 
@@ -56,7 +56,7 @@ describe("Chat & Model Intelligence (#1)", () => {
     
     mockAxios.post.mockResolvedValue({
       data: {
-        model: "anthropic/claude-3.5-sonnet",
+        model: "anthropic/claude-sonnet-4.6",
         choices: [{ message: { content: "Coding is fun!" } }],
         usage: { prompt_tokens: 5, completion_tokens: 10 }
       }
@@ -81,7 +81,7 @@ describe("Chat & Model Intelligence (#1)", () => {
 
     mockAxios.post.mockResolvedValue({
       data: {
-        model: "meta-llama/llama-3.1-8b-instruct",
+        model: "openai/gpt-5.4-nano",
         choices: [{ message: { content: mockRecommendation } }],
         usage: { prompt_tokens: 10, completion_tokens: 5 }
       }
@@ -105,7 +105,7 @@ describe("Chat & Model Intelligence (#1)", () => {
 
     mockAxios.post.mockResolvedValue({
       data: {
-        model: "anthropic/claude-3.5-sonnet",
+        model: "anthropic/claude-sonnet-4.6",
         choices: [{ message: { content: mockOptimized } }],
         usage: { prompt_tokens: 10, completion_tokens: 10 }
       }

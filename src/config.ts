@@ -13,11 +13,11 @@ export const USER_ENV_PATH = path.join(os.homedir(), "dev/.env");
 export const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";
 
 export const PRESETS: Record<string, string[]> = {
-  "smart": ["anthropic/claude-3.5-sonnet", "openai/gpt-4o", "google/gemini-pro-1.5"],
-  "cheap": ["meta-llama/llama-3-8b-instruct", "google/gemini-flash-1.5", "deepseek/deepseek-chat"],
-  "creative": ["anthropic/claude-3-opus", "openai/gpt-4-turbo", "anthropic/claude-3-5-sonnet"],
-  "fast": ["google/gemini-flash-1.5", "meta-llama/llama-3-70b-instruct", "anthropic/claude-3-haiku"],
-  "coder": ["anthropic/claude-3.5-sonnet", "deepseek/deepseek-coder", "openai/gpt-4o"],
+  "smart": ["anthropic/claude-opus-4.7", "openai/gpt-5.5", "x-ai/grok-4.20"],
+  "cheap": ["openai/gpt-5.4-nano", "qwen/qwen-3.6-flash", "google/gemini-3.1-flash-lite"],
+  "creative": ["openai/gpt-5.5", "anthropic/claude-sonnet-4.6", "google/gemini-3.1-pro"],
+  "fast": ["google/gemini-3.1-flash-lite", "openai/gpt-5.4-nano", "qwen/qwen-3.6-flash"],
+  "coder": ["anthropic/claude-sonnet-4.6", "openai/gpt-5.4", "google/gemini-3.1-pro"],
 };
 
 export const DEFAULT_RATE_CONFIG: RateLimiterConfig = {
