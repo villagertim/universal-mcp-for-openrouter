@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { registerModelTools } from "../src/tools/models.js";
-import { ServerContext } from "../src/types.js";
+import { registerModelTools } from "../../src/tools/models.js";
+import { ServerContext } from "../../src/types.js";
 import { AxiosInstance } from "axios";
 
 describe("Models & Session Management (#2)", () => {

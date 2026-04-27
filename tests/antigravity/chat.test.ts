@@ -3,8 +3,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 // Set environment variable BEFORE importing the module that uses it at top level
 vi.stubEnv("OPENROUTER_API_KEY", "sk-test-key");
 
-import { registerChatTools } from "../src/tools/chat.js";
-import { ServerContext } from "../src/types.js";
+import { registerChatTools } from "../../src/tools/chat.js";
+import { ServerContext } from "../../src/types.js";
 import { AxiosInstance } from "axios";
 
 describe("Chat & Model Intelligence (#1)", () => {

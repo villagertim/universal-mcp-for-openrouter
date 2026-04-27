@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { registerVisionTools } from "../src/tools/vision.js";
-import { ServerContext } from "../src/types.js";
+import { registerVisionTools } from "../../src/tools/vision.js";
+import { ServerContext } from "../../src/types.js";
 import { AxiosInstance } from "axios";
 import fs from "fs/promises";
 

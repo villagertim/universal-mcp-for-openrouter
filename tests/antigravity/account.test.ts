@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { registerAccountTools } from "../src/tools/account.js";
-import { ServerContext } from "../src/types.js";
+import { registerAccountTools } from "../../src/tools/account.js";
+import { ServerContext } from "../../src/types.js";
 import { AxiosInstance } from "axios";
 
 describe("Account Management (#3)", () => {

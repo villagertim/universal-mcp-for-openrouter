@@ -1,13 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { registerCodeTools } from "../src/tools/code.js";
-import { registerAnalysisTools } from "../src/tools/analysis.js";
-import { ServerContext } from "../src/types.js";
+import { registerCodeTools } from "../../src/tools/code.js";
+import { registerAnalysisTools } from "../../src/tools/analysis.js";
+import { ServerContext } from "../../src/types.js";
 import { AxiosInstance } from "axios";
 import fs from "fs/promises";
 import path from "path";
-import * as embeddings from "../src/helpers/embeddings.js";
-import * as contextStore from "../src/helpers/context-store.js";
-import { SYMBOL_INDEX_PATH } from "../src/config.js";
+import * as embeddings from "../../src/helpers/embeddings.js";
+import * as contextStore from "../../src/helpers/context-store.js";
+import { SYMBOL_INDEX_PATH } from "../../src/config.js";
 
 // Mock fs/promises
 vi.mock("fs/promises");

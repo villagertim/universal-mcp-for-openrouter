@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { registerCodeTools } from "../src/tools/code.js";
-import { registerVisionTools } from "../src/tools/vision.js";
-import { ServerContext } from "../src/types.js";
+import { registerCodeTools } from "../../src/tools/code.js";
+import { registerVisionTools } from "../../src/tools/vision.js";
+import { ServerContext } from "../../src/types.js";
 import { AxiosInstance } from "axios";
 import os from "os";
 import path from "path";

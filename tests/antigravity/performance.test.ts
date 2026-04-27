@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { registerChatTools } from "../src/tools/chat.js";
-import { registerModelTools } from "../src/tools/models.js";
-import { ServerContext } from "../src/types.js";
+import { registerChatTools } from "../../src/tools/chat.js";
+import { registerModelTools } from "../../src/tools/models.js";
+import { ServerContext } from "../../src/types.js";
 import { AxiosInstance } from "axios";
 
 describe("Performance & Reliability (#9)", () => {

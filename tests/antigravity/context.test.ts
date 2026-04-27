@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { registerContextTools } from "../src/tools/context.js";
-import { ServerContext } from "../src/types.js";
+import { registerContextTools } from "../../src/tools/context.js";
+import { ServerContext } from "../../src/types.js";
 import { AxiosInstance } from "axios";
-import * as embeddings from "../src/helpers/embeddings.js";
-import * as contextStore from "../src/helpers/context-store.js";
+import * as embeddings from "../../src/helpers/embeddings.js";
+import * as contextStore from "../../src/helpers/context-store.js";
 
 // Mock helpers
 vi.mock("../src/helpers/embeddings.js");

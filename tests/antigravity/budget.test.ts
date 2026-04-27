@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { registerBudgetTools } from "../src/tools/budget.js";
-import { ServerContext } from "../src/types.js";
+import { registerBudgetTools } from "../../src/tools/budget.js";
+import { ServerContext } from "../../src/types.js";
 import { AxiosInstance } from "axios";
-import { guardedCompletionPost } from "../src/helpers/rate-guard.js";
-import * as configStore from "../src/helpers/config-store.js";
+import { guardedCompletionPost } from "../../src/helpers/rate-guard.js";
+import * as configStore from "../../src/helpers/config-store.js";
 
 vi.mock("../src/helpers/config-store.js");
 
