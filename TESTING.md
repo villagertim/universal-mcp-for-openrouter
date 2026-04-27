@@ -1,20 +1,22 @@
-# Testing & Verification Report: OpenRouter MCP Server
+# Testing & Verification Report: Universal MCP for OpenRouter
 
-This document outlines the testing strategy, test cases, and verification results for the OpenRouter MCP server. All capabilities have been verified via automated unit tests and integration tests to ensure production-grade reliability for agentic workflows.
+> **⚠️ Profile:** All tests documented below were conducted using the **Antigravity** profile (`--profile antigravity`). Other profiles (`claude-code`, `cursor`, `windsurf`, `generic`) have **not yet been tested**. See `tests/[profile]/README.md` for contribution guidelines.
+
+This document outlines the testing strategy, test cases, and verification results for the MCP server running under the Antigravity profile. All capabilities have been verified via automated unit tests and integration tests.
 
 ## 📊 Summary of Results
 
 | Category | Status | Verification Method |
 | :--- | :--- | :--- |
-| **1. Chat & Model Intelligence** | ✅ Passed | `tests/chat.test.ts` |
-| **2. Models & Session Management** | ✅ Passed | `tests/models.test.ts` |
-| **3. Account Management** | ✅ Passed | `tests/account.test.ts` |
-| **4. Vision Capabilities** | ✅ Passed | `tests/vision.test.ts` |
-| **5. Semantic Memory (Context Store)** | ✅ Passed | `tests/context.test.ts` |
-| **6. Code Intelligence & Analysis** | ✅ Passed | `tests/code_intelligence.test.ts` |
-| **7. Budget & Rate Limiting** | ✅ Passed | `tests/budget.test.ts` |
-| **8. Security & Authentication** | ✅ Passed | `tests/security.test.ts` |
-| **9. Performance & Reliability** | ✅ Passed | `tests/performance.test.ts` |
+| **1. Chat & Model Intelligence** | ✅ Passed | `tests/antigravity/chat.test.ts` |
+| **2. Models & Session Management** | ✅ Passed | `tests/antigravity/models.test.ts` |
+| **3. Account Management** | ✅ Passed | `tests/antigravity/account.test.ts` |
+| **4. Vision Capabilities** | ✅ Passed | `tests/antigravity/vision.test.ts` |
+| **5. Semantic Memory (Context Store)** | ✅ Passed | `tests/antigravity/context.test.ts` |
+| **6. Code Intelligence & Analysis** | ✅ Passed | `tests/antigravity/code_intelligence.test.ts` |
+| **7. Budget & Rate Limiting** | ✅ Passed | `tests/antigravity/budget.test.ts` |
+| **8. Security & Authentication** | ✅ Passed | `tests/antigravity/security.test.ts` |
+| **9. Performance & Reliability** | ✅ Passed | `tests/antigravity/performance.test.ts` |
 
 ---
 
