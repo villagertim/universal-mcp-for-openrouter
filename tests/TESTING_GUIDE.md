@@ -33,11 +33,11 @@ npx vitest run tests/antigravity/
 # Claude Code tests only (when available)
 npx vitest run tests/claude-code/
 
-# Cursor tests only (when available)
-npx vitest run tests/cursor/
+# Codex tests only (when available)
+npx vitest run tests/codex/
 
-# Windsurf tests only (when available)
-npx vitest run tests/windsurf/
+# Opencode tests only (when available)
+npx vitest run tests/opencode/
 
 # Generic tests only (when available)
 npx vitest run tests/generic/
@@ -74,9 +74,9 @@ tests/
 │
 ├── claude-code/              ⚠️ Not yet tested — contributions welcome
 │   └── README.md
-├── cursor/                   ⚠️ Not yet tested — contributions welcome
+├── codex/                    ⚠️ Not yet tested — contributions welcome
 │   └── README.md
-├── windsurf/                 ⚠️ Not yet tested — contributions welcome
+├── opencode/                 ⚠️ Not yet tested — contributions welcome
 │   └── README.md
 └── generic/                  ⚠️ Not yet tested — contributions welcome
     └── README.md
@@ -177,7 +177,7 @@ Title format: `test: add verified tests for [platform] profile`
 
 Use this matrix to know which test files are relevant for each profile:
 
-| Test File | Antigravity | Claude Code | Cursor | Windsurf | Generic |
+| Test File | Antigravity | Claude Code | Codex | Opencode | Generic |
 |---|---|---|---|---|---|
 | `chat.test.ts` | ✅ | ✅ | ✅ | ✅ | ✅ |
 | `models.test.ts` | ✅ | ✅ | ✅ | ✅ | ✅ |

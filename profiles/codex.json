@@ -1,5 +1,5 @@
 {
-  "_comment": "Cursor profile: Strong codebase indexing + image input, but no persistent memory.",
+  "_comment": "Codex profile: Strong codebase indexing + image input, but no persistent memory.",
   "_tested": false,
   "_status": "Community-contributed — not tested by the maintainer. See PROFILES.md for details.",
   "chat_completion": true,

@@ -23,8 +23,10 @@
     "ai",
     "agent",
     "llm",
-    "claude",
-    "cursor"
+    "antigravity",
+    "claude-code",
+    "opencode",
+    "codex"
   ],
   "author": "Timothy Reid",
   "license": "MIT",

@@ -1,6 +1,6 @@
 # Testing & Verification Report: Universal MCP for OpenRouter
 
-> **⚠️ Profile:** All tests documented below were conducted using the **Antigravity** profile (`--profile antigravity`). Other profiles (`claude-code`, `cursor`, `windsurf`, `generic`) have **not yet been tested**. See `tests/[profile]/README.md` for contribution guidelines.
+> **⚠️ Profile:** All tests documented below were conducted using the **Antigravity** profile (`--profile antigravity`). Other profiles (`claude-code`, `codex`, `opencode`, `generic`) have **not yet been tested**. See `tests/[profile]/README.md` for contribution guidelines.
 
 This document outlines the testing strategy, test cases, and verification results for the MCP server running under the Antigravity profile. All capabilities have been verified via automated unit tests and integration tests.
 

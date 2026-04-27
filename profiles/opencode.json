@@ -1,5 +1,5 @@
 {
-  "_comment": "Windsurf profile: Cascade provides codebase indexing + persistent memory, but no native vision.",
+  "_comment": "Opencode profile: Opencode Native provides codebase indexing + persistent memory, but no native vision.",
   "_tested": false,
   "_status": "Community-contributed — not tested by the maintainer. See PROFILES.md for details.",
   "chat_completion": true,

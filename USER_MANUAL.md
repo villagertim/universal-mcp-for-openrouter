@@ -695,26 +695,26 @@ The exact configuration depends on which MCP client you are using. The general p
 }
 ```
 
-**For Cursor** (edit `.cursor/mcp.json` in your project or home directory):
+**For Codex** (edit your MCP configuration):
 
 ```json
 {
   "servers": {
     "openrouter": {
       "command": "universal-mcp-for-openrouter",
-      "args": ["--profile", "cursor"]
+      "args": ["--profile", "codex"]
     }
   }
 }
 ```
 
-**For Windsurf:**
+**For Opencode:**
 ```json
 {
   "mcpServers": {
     "openrouter": {
       "command": "universal-mcp-for-openrouter",
-      "args": ["--profile", "windsurf"]
+      "args": ["--profile", "opencode"]
     }
   }
 }
@@ -748,8 +748,8 @@ The `--profile` flag in the configuration above tells the server which tools to 
 |---|---|---|
 | `antigravity` | Google Antigravity | ✅ **Tested and verified** — all 9 test suites passing |
 | `claude-code` | Claude Code | ⚠️ Community-contributed — **not yet tested** |
-| `cursor` | Cursor | ⚠️ Community-contributed — **not yet tested** |
-| `windsurf` | Windsurf | ⚠️ Community-contributed — **not yet tested** |
+| `codex` | Codex | ⚠️ Community-contributed — **not yet tested** |
+| `opencode` | Opencode | ⚠️ Community-contributed — **not yet tested** |
 | `generic` | Any / Unknown | ⚠️ Community-contributed — **not yet tested** (all tools enabled) |
 
 If you experience issues with an untested profile, you can:

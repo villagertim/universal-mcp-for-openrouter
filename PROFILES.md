@@ -12,8 +12,8 @@ Profiles control which tools are enabled or disabled for a specific AI coding pl
 |---|---|---|---|
 | **Antigravity** | `antigravity.json` | ✅ **Tested** | Production-verified by maintainer |
 | **Claude Code** | `claude-code.json` | ❌ Not tested | Based on known Claude Code capabilities |
-| **Cursor** | `cursor.json` | ❌ Not tested | Based on known Cursor capabilities |
-| **Windsurf** | `windsurf.json` | ❌ Not tested | Based on known Cascade capabilities |
+| **Codex** | `codex.json` | ❌ Not tested | Based on known Codex capabilities |
+| **Opencode** | `opencode.json` | ❌ Not tested | Based on known Opencode Native capabilities |
 | **Generic** | `generic.json` | ❌ Not tested | All tools enabled — safe fallback |
 
 If you use one of the untested profiles and find that adjustments are needed, we welcome contributions! See "Creating Your Own Profile" below.
@@ -44,7 +44,7 @@ Add `--profile` to your MCP server args in your client's configuration:
 }
 ```
 
-Replace `antigravity` with any profile name: `claude-code`, `cursor`, `windsurf`, or `generic`.
+Replace `antigravity` with any profile name: `claude-code`, `codex`, `opencode`, or `generic`.
 
 ---
 
@@ -52,7 +52,7 @@ Replace `antigravity` with any profile name: `claude-code`, `cursor`, `windsurf`
 
 This table shows which tools each profile enables (✅) or disables (❌):
 
-| Tool | Antigravity | Claude Code | Cursor | Windsurf | Generic |
+| Tool | Antigravity | Claude Code | Codex | Opencode | Generic |
 |---|---|---|---|---|---|
 | `chat_completion` | ✅ | ✅ | ✅ | ✅ | ✅ |
 | `chat_with_preset` | ✅ | ✅ | ✅ | ✅ | ✅ |
@@ -81,9 +81,9 @@ This table shows which tools each profile enables (✅) or disables (❌):
 
 **Claude Code** — Disables code indexing tools (Claude Code has built-in file search and grep) but keeps memory and vision tools enabled since Claude Code has no native equivalents.
 
-**Cursor** — Similar to Claude Code but also disables vision (Cursor supports image input natively). Keeps memory tools enabled.
+**Codex** — Similar to Claude Code but also disables vision (Codex supports image input natively). Keeps memory tools enabled.
 
-**Windsurf** — Disables code indexing (Cascade has codebase awareness) and memory tools (Cascade has built-in session memory). Keeps vision enabled since Windsurf has no native image analysis.
+**Opencode** — Disables code indexing (Opencode Native has codebase awareness) and memory tools (Opencode Native has built-in session memory). Keeps vision enabled since Opencode has no native image analysis.
 
 **Generic** — Enables everything. Use this if your platform isn't listed or if you're unsure what your platform provides natively. You can always disable tools later by creating a custom profile.
 
