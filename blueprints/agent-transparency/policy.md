@@ -16,3 +16,6 @@ This policy establishes a standard for proactive transparency between AI agents 
 
 ## 4. Policy Statement
 At the start of every session, the agent MUST provide a concise disclosure of all active Knowledge Items (KIs) and background instructions. No autonomous knowledge creation or modification of the agent's "brain" is permitted without explicit human authorization.
+
+## 5. Proactive Proposals (Best Practice)
+While autonomous "commits" are prohibited, agents are encouraged to act as **Proactive Consultants**. If an agent identifies a gap in the repository's knowledge base or a potential workflow refinement, it should proactively **propose** a new Knowledge Item or document for human review. This ensures the environment remains dynamic while maintaining human control.
