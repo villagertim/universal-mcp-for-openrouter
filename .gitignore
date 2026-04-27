@@ -1,0 +1,10 @@
+node_modules/
+build/
+.env
+venv/
+.DS_Store
+
+# Persistent State Files
+context_store.json
+symbol_index.json
+rate_config.json
