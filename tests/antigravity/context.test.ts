@@ -6,8 +6,8 @@ import * as embeddings from "../../src/helpers/embeddings.js";
 import * as contextStore from "../../src/helpers/context-store.js";
 
 // Mock helpers
-vi.mock("../src/helpers/embeddings.js");
-vi.mock("../src/helpers/context-store.js");
+vi.mock("../../src/helpers/embeddings.js");
+vi.mock("../../src/helpers/context-store.js");
 
 describe("Semantic Memory (#5)", () => {
   let mockCtx: ServerContext;

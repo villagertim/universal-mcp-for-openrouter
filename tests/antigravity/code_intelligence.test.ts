@@ -11,8 +11,8 @@ import { SYMBOL_INDEX_PATH } from "../../src/config.js";
 
 // Mock fs/promises
 vi.mock("fs/promises");
-vi.mock("../src/helpers/embeddings.js");
-vi.mock("../src/helpers/context-store.js");
+vi.mock("../../src/helpers/embeddings.js");
+vi.mock("../../src/helpers/context-store.js");
 
 describe("Code Intelligence & Analysis (#6)", () => {
   let mockCtx: ServerContext;

@@ -5,7 +5,7 @@ import { AxiosInstance } from "axios";
 import { guardedCompletionPost } from "../../src/helpers/rate-guard.js";
 import * as configStore from "../../src/helpers/config-store.js";
 
-vi.mock("../src/helpers/config-store.js");
+vi.mock("../../src/helpers/config-store.js");
 
 describe("Budget & Rate Limiting (#7)", () => {
   let mockCtx: ServerContext;
