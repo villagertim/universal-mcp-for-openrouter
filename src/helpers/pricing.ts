@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 import { ServerContext, Usage } from "../types.js";
 
 export async function refreshPricingCache(ctx: ServerContext) {

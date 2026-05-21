@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 import fs from "fs/promises";
 import { RATE_CONFIG_PATH, DEFAULT_RATE_CONFIG } from "../config.js";
 import { RateLimiterConfig } from "../types.js";

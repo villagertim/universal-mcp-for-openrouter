@@ -1,6 +1,6 @@
 # OpenRouter MCP Server
 
-A production-ready Model Context Protocol (MCP) server that acts as an intelligent, agentic gateway to OpenRouter's 200+ AI models. Built for advanced multi-repo development workflows.
+An unofficial, production-ready Model Context Protocol (MCP) server that acts as an intelligent, agentic gateway to OpenRouter's 200+ AI models. Built for advanced multi-repo development workflows.
 
 Now fully modularized and config-driven for maximum flexibility.
 
@@ -151,7 +151,12 @@ retrieve_context(query: "how does authentication work", top_k: 3)
 - **Custom Presets** can be modified in `src/config.ts`.
 - **stdout is redirected to stderr** to protect the MCP stdio protocol stream.
 
+*Maintained by Antigravity · Last updated May 21, 2026*
+
 ---
 
-*Maintained by Antigravity · Last updated April 27, 2026*
+## ⚖️ Trademark Disclaimer
+
+*"Universal MCP for OpenRouter" is an independent, community-developed project. It is not affiliated with, endorsed by, or officially connected to OpenRouter, Inc. "OpenRouter" is a trademark of OpenRouter, Inc.*
+
 

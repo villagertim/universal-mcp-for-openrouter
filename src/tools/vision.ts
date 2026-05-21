@@ -1,9 +1,11 @@
+// SPDX-License-Identifier: MIT
+
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { ServerContext, VisionAnalyzeArgs } from "../types.js";
 import { guardedCompletionPost } from "../helpers/rate-guard.js";
 import { trackUsage } from "../helpers/pricing.js";
 import { getMimeType } from "../helpers/mime.js";
-import { validatePath } from "../helpers/path-utils.js";
+import { validatePath, resolveHomePath } from "../helpers/path-utils.js";
 import fs from "fs/promises";
 
 export function registerVisionTools(ctx: ServerContext) {
@@ -16,7 +18,7 @@ export function registerVisionTools(ctx: ServerContext) {
         properties: {
           image_path: {
             type: "string",
-            description: "Local path to the image file (e.g., /path/to/screenshot.png)"
+            description: "Local path to the image file (e.g., /path/to/screenshot.png or ~/screenshot.png)"
           },
           image_url: {
             type: "string",
@@ -49,9 +51,10 @@ export function registerVisionTools(ctx: ServerContext) {
     try {
       let imageUrlToSend = image_url;
       if (image_path) {
-        validatePath(image_path);
-        const fileData = await fs.readFile(image_path);
-        const mimeType = getMimeType(image_path);
+        const expandedPath = resolveHomePath(image_path);
+        validatePath(expandedPath);
+        const fileData = await fs.readFile(expandedPath);
+        const mimeType = getMimeType(expandedPath);
         imageUrlToSend = `data:${mimeType};base64,${fileData.toString("base64")}`;
       }
       const response = await guardedCompletionPost(ctx, model, {
@@ -65,3 +68,4 @@ export function registerVisionTools(ctx: ServerContext) {
     }
   }
 }
+

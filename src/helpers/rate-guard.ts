@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 import { ServerContext } from "../types.js";
 
 export function checkBudget(ctx: ServerContext): { allowed: boolean; message?: string } {

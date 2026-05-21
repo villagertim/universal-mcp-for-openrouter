@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
@@ -27,6 +29,7 @@ import { registerContextTools } from "./tools/context.js";
 import { registerCodeTools } from "./tools/code.js";
 import { registerAnalysisTools } from "./tools/analysis.js";
 import { registerBudgetTools } from "./tools/budget.js";
+import { registerVerifyTools } from "./tools/verify.js";
 
 // Redirect all console.log to stderr to prevent corrupting the MCP stdout stream
 console.log = (...args) => console.error(...args);
@@ -60,6 +63,7 @@ class OpenRouterServer {
 
     const axiosInstance = axios.create({
       baseURL: OPENROUTER_BASE_URL,
+      timeout: 60000,
       headers: {
         "authorization": `Bearer ${OPENROUTER_API_KEY}`,
         "HTTP-Referer": process.env.SITE_URL || "http://localhost",
@@ -112,6 +116,7 @@ class OpenRouterServer {
       registerCodeTools(this.ctx),
       registerAnalysisTools(this.ctx),
       registerBudgetTools(this.ctx),
+      registerVerifyTools(this.ctx),
     ];
 
     const enabledTools: any[] = [];

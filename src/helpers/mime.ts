@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 import path from "path";
 
 export function getMimeType(filePath: string): string {

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
 import { 

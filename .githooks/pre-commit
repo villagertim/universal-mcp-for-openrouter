@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+
+# SPDX-License-Identifier: MIT
+
+# Pre-commit hook to detect hardcoded secrets (API keys) in staged changes.
+
+# Harmonic HSL Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
+
+echo -e "${CYAN}🔍 Scanning staged files for potential secrets...${NC}"
+
+SECRETS_FOUND=0
+
+# Regex pattern for keys:
+# 1. OpenRouter API Key (sk-or-...)
+# 2. Generic high-entropy keys (sk-...)
+KEY_PATTERN="sk-(or-)?[a-zA-Z0-9_-]{16,}"
+
+while IFS= read -r -d '' FILE; do
+    if [ -z "$FILE" ]; then
+        continue
+    fi
+
+    # Skip binary files, package locks, or specific configuration files
+    if [[ "$FILE" == *"package-lock.json"* || "$FILE" == *".png"* || "$FILE" == *".jpg"* || "$FILE" == *".ico"* || "$FILE" == *"symbol_index.json"* || "$FILE" == *"context_store.json"* ]]; then
+        continue
+    fi
+
+    # Scan staged changes for the pattern, filtering out safe example placeholders in documentation
+    MATCHES=$(git diff --cached -- "$FILE" | grep -E "^\+" | grep -E "$KEY_PATTERN" | grep -viE "example|placeholder|do-not-use|your-key|your_key|your-actual-key")
+
+    if [ ! -z "$MATCHES" ]; then
+        echo -e "${RED}❌ POTENTIAL SECRET DETECTED in staged file: ${YELLOW}$FILE${NC}"
+        echo -e "Lines matching: \n$MATCHES"
+        SECRETS_FOUND=$((SECRETS_FOUND + 1))
+    fi
+done < <(git diff --cached -z --name-only --diff-filter=ACM)
+
+if [ "$SECRETS_FOUND" -gt 0 ]; then
+    echo -e "\n${RED}⚠️ Commit aborted! Pre-commit secret detection found $SECRETS_FOUND potential secret(s).${NC}"
+    echo -e "If this is a false positive, you can commit with '--no-verify' after manual inspection."
+    exit 1
+fi
+
+echo -e "${GREEN}✅ No secrets detected. Staged files are clean!${NC}"
+exit 0

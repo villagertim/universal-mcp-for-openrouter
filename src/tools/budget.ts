@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { ServerContext, SetBudgetArgs } from "../types.js";
 import { saveRateConfig } from "../helpers/config-store.js";

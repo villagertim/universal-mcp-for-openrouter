@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 import fs from "fs/promises";
 import path from "path";
 import { CONFIG_FILE_PATH, PROFILES_DIR } from "../config.js";

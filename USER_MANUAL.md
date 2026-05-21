@@ -1555,6 +1555,8 @@ Indexed project: my-app
 
 **Tips:**
 - Indexing large projects can take a minute or two. This is normal.
+- **Tilde Path Expansion:** You can use the standard tilde prefix (`~` or `~/`) in `project_path` to refer to your home directory (e.g., `~/dev/my-project`). The server will automatically expand it to the correct absolute system path (e.g., `/home/username/dev/my-project` or `/Users/username/dev/my-project`) on both Linux and macOS.
+- **100% Path Portability:** The indexer stores all file references as relative paths from the project root. When you or another developer run symbol searches later, the server dynamically reconstructs absolute paths relative to the project directory or current workspace. This makes your symbol database (`symbol_index.json`) fully portable across machines.
 - The `project_name` you choose will be used in `search_symbols`, `semantic_code_search`, and `reindex_project`. Choose something memorable and consistent.
 - The index is stored locally. It does not send your code to any external service beyond what is needed for embedding generation.
 - If your project changes significantly, use `reindex_project` to update the index.
@@ -1872,7 +1874,7 @@ Sends an image (from your computer or a URL) to a vision-capable AI model and re
 
 | Parameter | Required | Type | Default | Description |
 |-----------|----------|------|---------|-------------|
-| `image_path` | No* | string | — | Absolute path to a local image file |
+| `image_path` | No* | string | — | Absolute path or home-relative path (e.g., `~/screenshots/nav.png`) |
 | `image_url` | No* | string | — | URL of an image to analyze |
 | `prompt` | No | string | "Describe this image in detail." | What to look for or analyze |
 | `model` | No | string | `google/gemini-flash-1.5` | The vision model to use |
@@ -1905,6 +1907,7 @@ Based on this, the server receives:
 
 **Tips:**
 - This is one of the key tools that may justify using OpenRouter — if your locally selected model does not have vision capabilities, `vision_analyze` provides that capability.
+- **Tilde Home Support:** The `image_path` parameter supports tilde expansion (`~` or `~/`), making it simple to reference image files in user directories (e.g., `~/Desktop/screenshot.png`).
 - The default model (`google/gemini-flash-1.5`) is cost-effective for most vision tasks.
 - Be specific in your `prompt`. "Describe this image" gives a general description. "Does this login form have accessibility issues?" gives a focused, actionable answer.
 
@@ -2070,6 +2073,46 @@ PRE-FLIGHT CHECKLIST
 
 ---
 
+### 12.3 Setup Verification Diagnostics
+
+To proactively prevent and troubleshoot execution problems, the server includes a dedicated setup verification tool called `verify_setup`. This tool runs a suite of diagnostic checks on the runtime environment, credentials, file permissions, and active budget session.
+
+You can trigger this diagnostic run at any time via your AI client using the following tool call:
+
+```json
+{
+  "name": "verify_setup"
+}
+```
+
+#### Diagnostic Suite Coverage
+
+When executed, the tool checks:
+1. **Node.js Compatibility:** Verifies that your current runtime meets the minimum required version (`>=20.12.0`). It warns you if dynamic module styling utilities (like the standard `styleText` export in Node's utilities) might be unavailable or crash-prone.
+2. **API Credentials:** Inspects your configured `OPENROUTER_API_KEY` and confirms if it conforms to the standard `sk-or-...` format without exposing your secret values.
+3. **Storage Permissiveness:** Probes the database storage directory permissions to ensure that the server can persist session budgets (`rate_config.json`), symbol maps (`symbol_index.json`), and pinned memories (`context_store.json`).
+4. **Usage Metrics:** Measures active memory caching metrics and current session spending against your configured maximum budget limit.
+
+#### Example Output
+
+Here is a typical passing diagnostic report returned by `verify_setup`:
+
+```markdown
+## 🔍 OpenRouter MCP Verification Report
+- **Node.js:** ✅ Passed (Version: `v20.14.0` >= `20.12.0`)
+- **API Key:** ✅ Configured (`sk-or-...` format verified)
+- **File Permissions:**
+  - `rate_config.json`: ✅ Accessible (Not yet created)
+  - `symbol_index.json`: ✅ Writable
+  - `context_store.json`: ✅ Writable
+- **Pricing Cache:** ✅ Active (185 models cached)
+- **Session Spend:** $0.000000 / $10.00 limit
+```
+
+If any check fails, the report will flag the specific issue (with a `⚠️ Warning` or `❌ Missing` status) and guide you on the exact path and context to fix.
+
+---
+
 ## Chapter 13: Sustainability & Responsible Usage
 
 ### 13.1 The Environmental Equation
@@ -2104,7 +2147,7 @@ Complex Task + Large Model = ✅ Appropriate (justified)
 
 ## Chapter 14: Quick Reference — The Cheat Sheet
 
-### 14.1 All 21 Tools at a Glance
+### 14.1 All 22 Tools at a Glance
 
 | # | Tool | Category | Key Input | What It Does |
 |---|---|---|---|---|
@@ -2129,6 +2172,7 @@ Complex Task + Large Model = ✅ Appropriate (justified)
 | 19 | `set_budget` | Budget | `max_dollars` | Set spending limits |
 | 20 | `get_budget_status` | Budget | (none) | Check spending status |
 | 21 | `get_session_usage` | Budget | (none) | Check token usage |
+| 22 | `verify_setup` | Diagnostics | (none) | Verify keys, permissions, and Node compatibility |
 
 ---
 
@@ -2218,7 +2262,7 @@ The best AI workflows aren't the ones that use the most powerful models. They're
 ---
 
 *OpenRouter MCP User's Manual — Human-Centric Edition*
-*For corrections, contributions, or feedback: refer to the project repository*
+*For corrections, contributions, or feedback: [refer to the project repository](https://github.com/tim/universal-mcp-for-openrouter)*
 
 ---
 

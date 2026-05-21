@@ -6,18 +6,9 @@ Items that must be addressed before public release. This file is a living docume
 
 ## Pre-Release Blockers
 
-### 🔴 #1 — GitHub Repository URL
+### ✅ #1 — GitHub Repository URL
 
-All of the following files contain placeholders or generic references that must be updated with the final public GitHub URL:
-
-| File | Line | Current Value | Update To |
-|---|---|---|---|
-| `LICENSE` | 4 | `[TBD: GitHub repository URL]` | `https://github.com/[username]/universal-mcp-for-openrouter` |
-| `USER_MANUAL.md` | 2140 | `refer to the project repository` | Add clickable link to GitHub URL |
-| `package.json` | — | (missing `repository` field) | Add `"repository": { "type": "git", "url": "..." }` |
-| `package.json` | — | (missing `homepage` field) | Add `"homepage": "..."` |
-| `package.json` | — | (missing `bugs` field) | Add `"bugs": { "url": ".../issues" }` |
-| `README.md` | — | No repo link | Add GitHub URL and badges |
+Done (May 2026). All repository placeholders, links, and package metadata are fully updated to point to `https://github.com/tim/universal-mcp-for-openrouter`.
 
 ---
 
@@ -33,12 +24,9 @@ Done (Apr 2026). Updated `name` to `universal-mcp-for-openrouter` and added all 
 
 ---
 
-### 🟡 #4 — OpenRouter Trademark Disclaimer in README
+### ✅ #4 — OpenRouter Trademark Disclaimer in README
 
-Disclaimer has been drafted in the User Manual (line 2159). The same notice needs to be added to `README.md` before public release.
-
-Draft text:
-> *"Universal MCP for OpenRouter" is an independent, community-developed project. It is not affiliated with, endorsed by, or officially connected to OpenRouter, Inc. "OpenRouter" is a trademark of OpenRouter, Inc.*
+Done (May 2026). Added official trademark notice section to the bottom of `README.md` and prefixed subtitle with "An unofficial," in alignment with branding rules.
 
 ---
 
@@ -47,7 +35,7 @@ Draft text:
 Model names in the User Manual were verified against the live OpenRouter catalog on **April 27, 2026**. Model availability changes frequently. Re-verify before release by running `list_models`.
 
 Files containing model references:
-- `USER_MANUAL_DRAFT.md` — Chapters 2, 4, 5, 11, 14
+- `USER_MANUAL.md` — Chapters 2, 4, 5, 11, 14
 - `README.md` — Example usage section
 
 ---
@@ -56,7 +44,7 @@ Files containing model references:
 
 | # | Item | Category | Priority | Notes |
 |---|---|---|---|---|
-| 6 | **Add "Hello World" verification step** | Documentation | Medium | User Manual peer review recommended a post-setup verification test. Not yet implemented. |
+| 6 | **Add "Hello World" verification step** | Documentation | ✅ Done (May 2026) | Implemented the custom server diagnostics tool (`verify_setup`). |
 | 7 | **Screenshots for setup instructions** | Documentation | Low | Peer review recommended platform-specific screenshots for Node.js and environment variable setup. |
 | 8 | **Companion troubleshooting guide** | Documentation | Low | Peer review suggested a standalone troubleshooting document beyond Chapter 12. |
 

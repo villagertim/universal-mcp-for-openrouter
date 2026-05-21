@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 import { ServerContext } from "../types.js";
 import { guardedEmbeddingPost } from "./rate-guard.js";
 import { trackUsage } from "./pricing.js";

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 import fs from "fs/promises";
 import { ContextEntry } from "../types.js";
 import { CONTEXT_STORE_PATH } from "../config.js";

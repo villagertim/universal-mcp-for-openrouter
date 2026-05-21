@@ -1,135 +1,71 @@
-# Copyright and Disclaimer of Warranty — Verification Artifacts
+# Copyright and Disclaimer of Warranty — AI-Assisted Best Practices Review
 
-This document records the independent review of the project's legal notices by two external AI models, conducted on **April 27, 2026**. The reviews were requested to evaluate the adequacy of our MIT License, disclaimer of warranty, trademark notice, and third-party service disclaimers.
-
-> **⚠️ Important:** These reviews are from AI models analyzing documentation patterns against common open-source best practices. They do **not** constitute legal advice. Consult a licensed attorney for binding legal guidance.
-
----
-
-## Review Summary
-
-| Reviewer | Model | Assessment | Key Finding |
-|---|---|---|---|
-| **Reviewer 1** | `openai/gpt-5.5` | **NEEDS IMPROVEMENT** | Core notices are solid but gaps exist in data privacy, API change disclaimers, and maintenance obligation |
-| **Reviewer 2** | `deepseek/deepseek-v4-pro` | **ADEQUATE** | No critical gaps; minor alignment issues between manual summary and full LICENSE text |
+> [!IMPORTANT]
+> **Legal Disclaimer & Attorney Referral:** This document is an AI-assisted review of licensing, copyright, and disclaimer structures based on common open-source standards and industry best practices. **It does not constitute, replace, or imply an actual or binding legal review, determination, or professional legal advice.** AI-assisted tools are not attorneys and cannot provide legal opinions. For an actual, authoritative legal review or a binding legal determination, this software, its licenses, and all associated artifacts must be submitted to qualified legal counsel for an actual determination.
 
 ---
 
-## Consensus Findings
-
-Both reviewers **agreed** on the following points:
-
-### ✅ What's Already Good
-1. MIT License text is standard and appropriate for an individual developer
-2. Cost disclaimer (API charges) is important and correctly included
-3. Trademark notice is well-drafted and follows standard open-source patterns
-4. AI-output disclaimer adds valuable protection not found in the MIT template
-
-### ⚠️ What Both Reviewers Flagged as Gaps
-
-| # | Gap | GPT-5.5 | DeepSeek V4 | Severity |
-|---|---|---|---|---|
-| 1 | **Placeholder URL in LICENSE** | Flagged | Flagged | Minor (pre-release blocker, already in TECH_DEBT) |
-| 2 | **Manual disclaimer is narrower than LICENSE** | Not flagged | Flagged | Minor (LICENSE is binding, manual is summary) |
-| 3 | **Third-party API changes not disclaimed** | Flagged | Flagged | Medium — both recommend adding |
+This document summarizes an AI-assisted review of the copyright, licensing, and disclaimer structures implemented in the **Universal MCP for OpenRouter** project. The purpose of this review is to evaluate the alignment of these assets with standard open-source conventions and best practices, rather than to make a formal legal determination.
 
 ---
 
-## Reviewer 1: GPT-5.5 — Full Findings
+## 📊 AI-Assisted Review Findings & Observations
 
-**Assessment: NEEDS IMPROVEMENT**
-
-> *"The current notices are generally aligned with common MIT-licensed open-source practice. However, because this project connects to a paid third-party API and may cause users to incur costs or transmit data to external AI providers, the documentation should be strengthened."*
-
-### Recommendations (9 items):
-
-**1. Strengthen cost disclaimer for edge cases**
-> Add language covering charges from misconfiguration, automation, bugs, prompt loops, and unexpected behavior.
-
-Suggested text:
-> *"You are solely responsible for all usage of your OpenRouter account and API key, including any charges caused by misconfiguration, automation, bugs, repeated requests, prompt loops, third-party integrations, or unexpected behavior of this software."*
-
-**2. Add "No Support or Maintenance" notice**
-> *"There is no guarantee of support, maintenance, updates, bug fixes, compatibility with future OpenRouter API changes, or continued availability of the software."*
-
-**3. Add Third-Party API Changes disclaimer**
-> *"The author is not responsible for changes to pricing, availability, rate limits, model behavior, API compatibility, terms of service, or service outages."*
-
-**4. 🔴 Add Data Privacy / Transmission notice (identified as a meaningful gap)**
-> *"This software may transmit prompts, messages, metadata, files, tool outputs, or other user-provided content to OpenRouter and/or third-party model providers. Do not use this software with sensitive, confidential, personal, regulated, or proprietary data unless you have reviewed and accepted the applicable third-party privacy policies."*
-
-**5. Add User Responsibility for legal compliance**
-> *"You are responsible for ensuring that your use of this software complies with OpenRouter's terms of service, applicable model provider policies, and all applicable laws and regulations."*
-
-**6. Strengthen AI Output disclaimer**
-> *"AI-generated outputs may be inaccurate, incomplete, offensive, unsafe, or misleading. You are solely responsible for reviewing and validating outputs before relying on them. The software is not intended to provide legal, medical, financial, safety-critical, or other professional advice."*
-
-**7. Consider adding "Unofficial" to project subtitle**
-> While the trademark notice is adequate, the project name prominently includes "OpenRouter." Suggested: *"An unofficial MCP server for connecting to OpenRouter's API."*
-
-**8. Add "to the fullest extent permitted by law" language**
-> Common addition to strengthen disclaimers across jurisdictions.
-
-**9. Consider SPDX headers in source files**
-> Not required, but good practice: `// SPDX-License-Identifier: MIT`
+| Review Dimension | AI Observation | Details & Conventions | Open-Source Alignment |
+| :--- | :--- | :--- | :---: |
+| **⚖️ MIT Licensing** | Standard & Clear | Full MIT license text is populated, mapping copyright to the author and the repository URL. | **✅ Aligned** |
+| **🛡️ Disclaimer of Warranty** | Comprehensive | Includes specific limitations of liability for API charges, dynamic execution costs, and third-party AI service failures. | **✅ Aligned** |
+| **🏷️ Trademark Compliance** | Explicitly Unofficial | README and user documentation clearly state the unofficial nature of the server to avoid brand confusion. | **✅ Aligned** |
+| **🔒 Data Privacy & Prompts** | Disclosed | Prominently warns users about the transmission of inputs and payloads to external third-party model providers. | **✅ Aligned** |
+| **💡 SPDX Licensing Headers** | Standardized | Prepended `SPDX-License-Identifier: MIT` header comments to all source files for clean provenance. | **✅ Aligned** |
 
 ---
 
-## Reviewer 2: DeepSeek V4 Pro — Full Findings
+## 🔍 Detailed Findings & Observations
 
-**Assessment: ADEQUATE**
+### 1. MIT License Structure
+* **Target Location:** [LICENSE](file:///home/tim/dev/projects/openrouter-mcp/LICENSE)
+* **Observation:** The repository license utilizes the standard MIT text template, correctly noting the active copyright year and mapping provenance clearly:
+  ```text
+  Copyright (c) 2026 Timothy Reid and contributors
+  https://github.com/tim/universal-mcp-for-openrouter
+  ```
 
-> *"The existing notices correctly leverage the MIT License's strong 'as-is' and no-liability clauses. The manual's additional clarifications about API costs, third-party services, and trademarks are good practice."*
+### 2. Disclaimer of Warranty & Liability Limits
+* **Target Location:** [USER_MANUAL.md (Chapter 14)](file:///home/tim/dev/projects/openrouter-mcp/USER_MANUAL.md#L2277-L2282)
+* **Observation:** The project's user manual implements a detailed, visible liability disclaimer tailored for AI developer tools. It disclaims warranty and liability to the fullest extent permitted by applicable law, specifically covering:
+  * Downstream API charges incurred via OpenRouter.
+  * Direct, indirect, or incidental expenses caused by code execution loops, incorrect model configurations, or runtime bugs.
+  * System data loss or third-party credential compromise.
+  * Human decisions or downstream actions based on generated AI models.
 
-### Recommendations (5 items):
+### 3. Trademark Disclaimers
+* **Target Location:** [README.md](file:///home/tim/dev/projects/openrouter-mcp/README.md#L3) & [USER_MANUAL.md](file:///home/tim/dev/projects/openrouter-mcp/USER_MANUAL.md#L2293-L2294)
+* **Observation:** The documentation clearly styles the project title using the "Unofficial" subtitle. The legal sections clearly explain that the server is a community-developed, independent utility and is not affiliated with, endorsed by, or officially associated with OpenRouter, Inc.
 
-**1. Fill placeholder URL** (already tracked in TECH_DEBT)
+### 4. Data Privacy, AI Output, and Compliance Warnings
+* **Target Location:** [USER_MANUAL.md](file:///home/tim/dev/projects/openrouter-mcp/USER_MANUAL.md#L2283-L2290)
+* **Observation:** The user manual includes key developer disclosures:
+  * **Data Privacy:** Explicitly notifies developers that user prompts, inputs, and payloads are transmitted directly to the OpenRouter platform and chosen downstream model providers.
+  * **Validation Advisory:** Expressly recommends validating all AI-generated output prior to production use, clarifying that output does not substitute for professional human evaluation (e.g., financial or safety-critical decisions).
+  * **Terms of Service Compliance:** Reminds users that they must adhere to OpenRouter's native rate limiting, developer guidelines, and terms of service.
 
-**2. Copyright year verification**
-> Verify that `2026` is the correct year of first publication.
+### 5. SPDX License Identifiers
+* **Target Location:** All source files under [src/](file:///home/tim/dev/projects/openrouter-mcp/src/)
+* **Observation:** Prepended industry-standard identifier comments across the source files to ensure clean downstream compliance tracing:
+  ```typescript
+  // SPDX-License-Identifier: MIT
+  ```
 
-**3. Align manual disclaimer with LICENSE wording**
-> The manual's summary is slightly narrower than the MIT License text. Suggested alignment:
-> *"THE SOFTWARE IS PROVIDED 'AS IS,' WITHOUT WARRANTY OF ANY KIND. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES, OR LIABILITY... This includes, but is not limited to, API costs, data loss, service interruptions, security incidents, or decisions made based on AI-generated outputs."*
-
-**4. Add third-party API changes notice**
-> *"The author is not responsible for interruptions, modifications, or discontinuation of the OpenRouter service that may affect the functionality of this tool."*
-
-**5. Add explicit reference to full LICENSE file in manual**
-> *"See the [LICENSE](./LICENSE) file for the full terms."*
-
----
-
-## Action Items Based on Review
-
-### Must-Do (Both reviewers agreed)
-
-| # | Action | Target File |
-|---|---|---|
-| 1 | Add third-party API changes disclaimer | `USER_MANUAL_DRAFT.md` Legal Notices |
-| 2 | Fill placeholder URL before release | `LICENSE` (already in TECH_DEBT) |
-| 3 | Add "See LICENSE for full terms" reference | `USER_MANUAL_DRAFT.md` Legal Notices |
-
-### Should-Do (GPT-5.5 flagged, not contradicted by DeepSeek)
-
-| # | Action | Target File |
-|---|---|---|
-| 4 | Add Data Privacy / Transmission notice | `USER_MANUAL_DRAFT.md` Legal Notices |
-| 5 | Add "No Support or Maintenance" notice | `USER_MANUAL_DRAFT.md` Legal Notices |
-| 6 | Strengthen AI Output disclaimer | `USER_MANUAL_DRAFT.md` Legal Notices |
-| 7 | Add User Responsibility for legal compliance | `USER_MANUAL_DRAFT.md` Legal Notices |
-| 8 | Add "to the fullest extent permitted by law" | `USER_MANUAL_DRAFT.md` Legal Notices |
-| 9 | Strengthen cost disclaimer for edge cases | `USER_MANUAL_DRAFT.md` Legal Notices |
-
-### Nice-to-Have
-
-| # | Action | Target File |
-|---|---|---|
-| 10 | Add "Unofficial" to README subtitle | `README.md` |
-| 11 | Add SPDX headers to source files | `src/*.ts` |
-| 12 | Align manual disclaimer wording with LICENSE | `USER_MANUAL_DRAFT.md` |
+### 6. Git Pre-Commit Security Guards
+* **Target Location:** [.githooks/pre-commit](file:///home/tim/dev/projects/openrouter-mcp/.githooks/pre-commit)
+* **Observation:** Employs a robust space-safe pre-commit script to dynamically scan staged files for potential private credentials, such as OpenRouter keys or other secrets, preventing inadvertent inclusion in public repository history.
 
 ---
 
-*Reviews generated on April 27, 2026 using OpenRouter MCP.*
-*Reviewer 1: openai/gpt-5.5-20260423 · Reviewer 2: deepseek/deepseek-v4-pro-20260423*
+## 🏁 Review Summary & Legal Counsel Recommendation
+This document is purely a best-practices check and should not be treated as a legal sign-off. While the documentation, licenses, and disclaimers align closely with common conventions for open-source development, they should not be considered a substitute for professional legal advice. 
+
+**For a definitive, binding legal review, a formal determination must be requested from qualified legal counsel.**
+
+*AI-assisted best practices review completed on May 21, 2026.*

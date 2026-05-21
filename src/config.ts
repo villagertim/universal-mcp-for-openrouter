@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 import path from "path";
 import os from "os";
 import { fileURLToPath } from "url";
