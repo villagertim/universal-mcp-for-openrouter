@@ -132,6 +132,20 @@ pin_context(
 retrieve_context(query: "how does authentication work", top_k: 3)
 ```
 
+------
+
+## 📋 Agent System Prompt Addendums
+
+To help your agentic coding assistants (like Claude Code, OpenClaw, or Hermes) make the best use of this MCP server, we have provided structured system prompt templates in the [templates/system-prompt-addendums/](file:///home/tim/dev/projects/openrouter-mcp/templates/system-prompt-addendums) directory:
+
+1. **[Cost-Aware & Budget-Safe Orchestration](file:///home/tim/dev/projects/openrouter-mcp/templates/system-prompt-addendums/1-cost-aware-orchestration.md):** Teaches the agent to route simple queries to cheap models and complex queries to premium models while tracking spending.
+2. **[Image & Vision Analysis Fallback](file:///home/tim/dev/projects/openrouter-mcp/templates/system-prompt-addendums/2-non-visual-vision-fallback.md):** Guides text-based or terminal-based clients on how to use our `vision_analyze` tool to "see" image assets.
+3. **[Prompt Optimization & Fallback Routing](file:///home/tim/dev/projects/openrouter-mcp/templates/system-prompt-addendums/3-resilient-refactoring-optimization.md):** Keeps major refactoring tasks cost-efficient and outage-resistant.
+4. **[Multi-Service Log Correlation](file:///home/tim/dev/projects/openrouter-mcp/templates/system-prompt-addendums/4-distributed-diagnostics.md):** Instructs the agent to isolate log ingestion to debug system failures quietly.
+5. **[Autonomous Loop Safety Policy](file:///home/tim/dev/projects/openrouter-mcp/templates/system-prompt-addendums/5-autonomous-loop-budget-safety.md):** A strict financial circuit breaker for autonomous background execution loops.
+
+Copy and paste these templates directly into your bot's system instructions or configuration environment to get started.
+
 ---
 
 ## Persistent Files
