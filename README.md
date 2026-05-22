@@ -147,6 +147,9 @@ To help your agentic coding assistants (like Claude Code, OpenClaw, or Hermes) m
 7. **[High-Throughput Batch Operations](file:///home/tim/dev/projects/openrouter-mcp/templates/system-prompt-addendums/7-high-throughput-batch-operations.md):** Orchestrates multi-file conversions and template updates with cost-effective models.
 8. **[CI/CD & Build Pipeline Diagnostics](file:///home/tim/dev/projects/openrouter-mcp/templates/system-prompt-addendums/8-pipeline-diagnostics.md):** Automates container crash diagnostics and patch validation to resolve build failures.
 9. **[Monorepo Dependency & Semver Syncing](file:///home/tim/dev/projects/openrouter-mcp/templates/system-prompt-addendums/9-monorepo-dependency-sync.md):** Performs pre-commit audits to keep package dependencies fully aligned across microservices.
+10. **[Enterprise Privacy & Sensitive Data Guardrails](file:///home/tim/dev/projects/openrouter-mcp/templates/system-prompt-addendums/10-enterprise-privacy-guardrails.md):** Redacts and mocks credentials or proprietary algorithms to prevent sensitive data leaks.
+11. **[Multi-Model Peer Review & Consensus](file:///home/tim/dev/projects/openrouter-mcp/templates/system-prompt-addendums/11-multi-model-consensus.md):** Emulates a double-model consensus flow to audit mission-critical code for exploits and concurrency bugs.
+12. **[Context Window Garbage Collection](file:///home/tim/dev/projects/openrouter-mcp/templates/system-prompt-addendums/12-context-garbage-collection.md):** Minimizes token pricing and eliminates hallucinations by periodically purging active context bloat.
 
 Copy and paste these templates directly into your bot's system instructions or configuration environment to get started.
 
