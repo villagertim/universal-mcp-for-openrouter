@@ -57,6 +57,7 @@ This table shows which tools each profile enables (✅) or disables (❌):
 | `chat_completion` | ✅ | ✅ | ✅ | ✅ | ✅ |
 | `chat_with_preset` | ✅ | ✅ | ✅ | ✅ | ✅ |
 | `list_models` | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `filter_models` | ✅ | ✅ | ✅ | ✅ | ✅ |
 | `get_balance` | ✅ | ✅ | ✅ | ✅ | ✅ |
 | `get_key_info` | ✅ | ✅ | ✅ | ✅ | ✅ |
 | `recommend_model` | ✅ | ✅ | ✅ | ✅ | ✅ |
@@ -64,6 +65,7 @@ This table shows which tools each profile enables (✅) or disables (❌):
 | `get_session_usage` | ✅ | ✅ | ✅ | ✅ | ✅ |
 | `set_budget` | ✅ | ✅ | ✅ | ✅ | ✅ |
 | `get_budget_status` | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `verify_setup` | ✅ | ✅ | ✅ | ✅ | ✅ |
 | `correlate_errors` | ✅ | ✅ | ✅ | ✅ | ✅ |
 | `dependency_graph` | ❌ | ❌ | ❌ | ❌ | ✅ |
 | `vision_analyze` | ❌ | ✅ | ❌ | ✅ | ✅ |

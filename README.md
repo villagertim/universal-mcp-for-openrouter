@@ -85,6 +85,14 @@ In your `mcp_config.json`:
 > 
 > Use OpenRouter's native limits to protect your wallet, and use the Universal MCP's budget tools to manage your agent's behavior.
 
+### 🛡️ Secret Redaction Firewall
+The server includes a built-in, local **Secret Redaction Firewall** that automatically intercepts prompts and embeddings to scan and redact:
+* OpenRouter API keys (`sk-or-v1-...`)
+* OpenAI API keys (`sk-proj-...`)
+* Private PEM key blocks (`-----BEGIN ... KEY-----`)
+
+This prevents accidental exposure of credentials to external network suppliers. If you explicitly need to transmit credentials for testing or key rotation workflows, you can set the environment variable `DISABLE_REDACTION=true` to bypass the firewall.
+
 ---
 
 ## Usage Guide
@@ -164,6 +172,7 @@ Copy and paste these templates directly into your bot's system instructions or c
 | `context_store.json` | Vector store for `pin_context` and `reindex_project` embeddings |
 | `symbol_index.json` | Symbol index from `index_project` |
 | `rate_config.json` | Persisted budget cap and warning threshold |
+| `pricing_cache.json` | Serialized pricing and model catalog cache for zero-network startups |
 
 ---
 

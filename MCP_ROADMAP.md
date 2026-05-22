@@ -34,6 +34,13 @@ Every `/chat/completions` call passes three pre-flight checks before the request
 - **Profiles:** Added support for `--profile` argument.
 - **Antigravity Profile:** Created `profiles/antigravity.json` to prune redundant tools.
 
+### Phase 5 — Performance & Safety Enhancements ✅
+**State Caching, Firewalls, and Multi-criteria Filtering**
+- **Zero-Network Instant Startup**: Loads full model lists and pricing cache instantly from `pricing_cache.json` on boot, running sync updates non-blockingly in the background.
+- **Secret Redaction Firewall**: Intercepts chat completion prompts and embeddings payloads local-side to sanitize OpenRouter keys (`sk-or-v1-`), OpenAI API keys (`sk-proj-`), and multi-line PEM private keys (RSA, EC, OPENSSH, etc.). Supports developer escape hatch via `DISABLE_REDACTION=true`.
+- **Fuzzy Model Filtering**: Added `filter_models` tool for fast local-side catalog search, context sizing, maximum prompt price caps, and vision-capability checks.
+- **Diagnostics Setup**: Added `verify_setup` tool for instant validation of runtime conditions, folder permissions, and Node compatibility.
+
 ---
 
 ## What Was Cut and Why

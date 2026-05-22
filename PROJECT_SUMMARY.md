@@ -1,14 +1,14 @@
 # OpenRouter MCP — Project Summary
 
-> Last updated: April 27, 2026
+> Last updated: May 21, 2026
 
 ---
 
 ## What This Is
 
-A production-ready MCP server that wraps the OpenRouter LLM API with 19 tools across six capability categories. Built to serve as the backbone for Antigravity, an AI coding agent doing advanced multi-repo development.
+A production-ready MCP server that wraps the OpenRouter LLM API with 22 tools across eight capability categories. Built to serve as the backbone for Antigravity, an AI coding agent doing advanced multi-repo development.
 
-Now fully modularized and config-driven (Phase 4).
+Now fully modularized, performance-optimized, and security-hardened.
 
 ---
 
@@ -26,13 +26,14 @@ A lightweight orchestrator that:
 ### 2. Domain Tool Modules (`src/tools/`)
 Tools are grouped into specialized modules:
 - `chat.ts`: Chat completions, presets, recommendations.
-- `models.ts`: Model listing and session usage metrics.
+- `models.ts`: Catalog listing, fuzzy filtering (`filter_models`), and session usage metrics.
 - `account.ts`: Balance and key information.
 - `vision.ts`: Image analysis.
 - `context.ts`: Semantic memory (pin/retrieve/clear).
 - `code.ts`: Indexing, semantic code search, and reindexing.
 - `analysis.ts`: Error correlation and dependency graphing.
 - `budget.ts`: Budget management and status.
+- `verify.ts`: Diagnostic suite environment verification (`verify_setup`).
 
 ### 3. Shared Helpers (`src/helpers/`)
 Centralized logic used across modules:
@@ -65,8 +66,9 @@ Profiles (found in `profiles/*.json`) allow for environment-specific toolsets.
 | Apr 26, 2026 | Phase 3 | `dependency_graph` with npm + Cargo support |
 | Apr 27, 2026 | Phase 4 | **Modular Refactor**: Extract tools/helpers + Config-driven toggling |
 | Apr 27, 2026 | Phase 5 | **Testing & Verification**: 33 automated tests + Path security sanitization |
+| May 21, 2026 | Phase 6 | **Performance & Safety**: local cache (`pricing_cache.json`), Key firewall, `filter_models`, `verify_setup` |
 
 ---
 
-*Built and Verified by Antigravity · April 27, 2026*
+*Built and Verified by Antigravity · May 21, 2026*
 

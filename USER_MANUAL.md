@@ -1128,6 +1128,49 @@ deepseek/deepseek-v4-pro
 
 ---
 
+### Tool 3b: `filter_models`
+
+**What it does:**
+Filters the complete OpenRouter model catalog based on your specific requirements (such as keyword queries, minimum context window, maximum prompt price, and image/vision capability). Serves results instantly from local cache.
+
+**When to use it:**
+- When you want to find specific model variants (e.g., all `claude` or `gemini` models)
+- When you need a model with a minimum context window (e.g., at least 32,000 tokens)
+- When you want to restrict model options based on prompt price cap (e.g., less than $1.50 per 1 million prompt tokens)
+- When you want to see only models that support vision inputs
+
+**Parameters:**
+
+| Parameter | Required | Type | Default | Description |
+|-----------|----------|------|---------|-------------|
+| `query` | No | string | — | Fuzzy keyword to match in model ID or name (e.g., `gemini`, `llama`) |
+| `min_context_length` | No | number | — | Minimum context window size in tokens (e.g., `32000`) |
+| `max_price_per_1m_prompt` | No | number | — | Maximum prompt cost in USD per 1,000,000 tokens (e.g., `2.00`) |
+| `supports_vision` | No | boolean | — | Filter for models that support or do not support vision inputs |
+| `limit` | No | number | `10` | Maximum number of models to return (max 50) |
+
+**How to ask for it:**
+
+> "Find all Gemini models that support vision and have at least a 32k context limit."
+
+Based on this, the server receives:
+```json
+{
+  "query": "gemini",
+  "min_context_length": 32000,
+  "supports_vision": true
+}
+```
+
+Other ways to trigger this tool:
+> "Filter models matching claude under $1 per million prompt tokens."
+> "Show me cheap models with at least a 100k context window."
+
+**What you get back:**
+A JSON-formatted list containing only the models that match all specified filtering criteria, matching the structure returned by `list_models` but filtered dynamically.
+
+---
+
 ### Tool 4: `recommend_model`
 
 **What it does:**
@@ -2045,6 +2088,39 @@ PRE-FLIGHT CHECKLIST
 
 ---
 
+### 11.4 Secret Redaction Firewall (Data Leak Prevention)
+
+To prevent accidental leaks of highly sensitive developer credentials or system keys during active conversations, the server contains an automatic, high-precision **Secret Redaction Firewall**.
+
+#### How it Works
+The firewall intercepts every outbound payload to `chat_completion` (chat prompts) and `embeddings` (code chunks) before they hit the network. It parses the entire input payload recursively and matches credentials using highly precise patterns:
+1. **OpenRouter API Keys**: Matches strings conforming to `sk-or-v1-[a-zA-Z0-9]{32,128}`.
+2. **OpenAI API Keys**: Matches strings conforming to `sk-proj-[a-zA-Z0-9_-]{32,128}`.
+3. **PEM Private Keys**: Matches standard PEM multi-line private key structures, including `-----BEGIN [A-Z0-9\s_-]+KEY----- ... -----END [A-Z0-9\s_-]+KEY-----` (which covers RSA, DSA, EC, OPENSSH, and generic private keys).
+
+Matched secrets are replaced instantly with a standard `[REDACTED]` placeholder, preventing them from ever leaving your local machine.
+
+#### Programmatic Escape Hatch
+For specialized environments (e.g. testing credential rotators, key verification agents, or closed enterprise networks) where you explicitly *intend* to send keys, you can disable the firewall by setting the environment variable:
+```env
+DISABLE_REDACTION=true
+```
+
+---
+
+### 11.5 Zero-Network Startup and Local Pricing Cache
+
+The OpenRouter MCP server features **Instant Startup Capability** using local pricing serialization.
+
+#### Startup Optimization
+Older versions of the server performed blocking network calls to OpenRouter's `/models` endpoint on startup to resolve models and their pricing structures, resulting in significant delays and high susceptibility to start failures if the API was offline or degraded.
+The server now implements:
+1. **Local Persistent Cache**: Stores the full OpenRouter model catalog, pricing, and context limits under a local `pricing_cache.json` state file.
+2. **Instant Initialization**: On boot, the server loads `pricing_cache.json` instantly into memory (`modelsCache`), letting the server register with your MCP client within milliseconds.
+3. **Background Syncing**: Once successfully started, the server schedules non-blocking background tasks to sync pricing maps from the remote API, updating `pricing_cache.json` on-the-fly and serving them without any blocking calls.
+
+---
+
 ## Chapter 12: Error Handling — What Went Wrong and How to Fix It
 
 ### 12.1 The Error Translation Guide
@@ -2156,22 +2232,22 @@ Complex Task + Large Model = ✅ Appropriate (justified)
 | 3 | `recommend_model` | Chat | `task` | Get a preset recommendation |
 | 4 | `optimize_prompt` | Chat | `prompt` | Improve a draft prompt |
 | 5 | `list_models` | Models | (none) | Browse all available models |
-| 6 | `get_balance` | Account | (none) | Check account credit |
-| 7 | `get_key_info` | Account | (none) | Check API key details |
-| 8 | `get_session_usage` | Account | (none) | Check session token usage |
-| 9 | `pin_context` | Memory | `text` | Store information for later |
-| 10 | `retrieve_context` | Memory | `query` | Search stored information |
-| 11 | `clear_context` | Memory | (optional) | Delete stored information |
-| 12 | `index_project` | Code | `project_path`, `project_name` | Index a project's symbols |
-| 13 | `search_symbols` | Code | `query` | Search indexed symbols |
-| 14 | `reindex_project` | Code | `project_name` | Deep semantic indexing |
-| 15 | `semantic_code_search` | Code | `query` | Natural language code search |
-| 16 | `correlate_errors` | Analysis | `logs` | Find root causes across logs |
-| 17 | `dependency_graph` | Analysis | (optional) | Analyze shared dependencies |
-| 18 | `vision_analyze` | Vision | `image_path` or `image_url` | Analyze images with AI |
-| 19 | `set_budget` | Budget | `max_dollars` | Set spending limits |
-| 20 | `get_budget_status` | Budget | (none) | Check spending status |
-| 21 | `get_session_usage` | Budget | (none) | Check token usage |
+| 6 | `filter_models` | Models | `query` | Filter models by context/price/vision |
+| 7 | `get_balance` | Account | (none) | Check account credit |
+| 8 | `get_key_info` | Account | (none) | Check API key details |
+| 9 | `get_session_usage` | Account | (none) | Check session token usage |
+| 10 | `pin_context` | Memory | `text` | Store information for later |
+| 11 | `retrieve_context` | Memory | `query` | Search stored information |
+| 12 | `clear_context` | Memory | (optional) | Delete stored information |
+| 13 | `index_project` | Code | `project_path`, `project_name` | Index a project's symbols |
+| 14 | `search_symbols` | Code | `query` | Search indexed symbols |
+| 15 | `reindex_project` | Code | `project_name` | Deep semantic indexing |
+| 16 | `semantic_code_search` | Code | `query` | Natural language code search |
+| 17 | `correlate_errors` | Analysis | `logs` | Find root causes across logs |
+| 18 | `dependency_graph` | Analysis | (optional) | Analyze shared dependencies |
+| 19 | `vision_analyze` | Vision | `image_path` or `image_url` | Analyze images with AI |
+| 20 | `set_budget` | Budget | `max_dollars` | Set spending limits |
+| 21 | `get_budget_status` | Budget | (none) | Check spending status |
 | 22 | `verify_setup` | Diagnostics | (none) | Verify keys, permissions, and Node compatibility |
 
 ---
