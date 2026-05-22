@@ -150,6 +150,8 @@ To help your agentic coding assistants (like Claude Code, OpenClaw, or Hermes) m
 10. **[Enterprise Privacy & Sensitive Data Guardrails](file:///home/tim/dev/projects/openrouter-mcp/templates/system-prompt-addendums/10-enterprise-privacy-guardrails.md):** Redacts and mocks credentials or proprietary algorithms to prevent sensitive data leaks.
 11. **[Multi-Model Peer Review & Consensus](file:///home/tim/dev/projects/openrouter-mcp/templates/system-prompt-addendums/11-multi-model-consensus.md):** Emulates a double-model consensus flow to audit mission-critical code for exploits and concurrency bugs.
 12. **[Context Window Garbage Collection](file:///home/tim/dev/projects/openrouter-mcp/templates/system-prompt-addendums/12-context-garbage-collection.md):** Minimizes token pricing and eliminates hallucinations by periodically purging active context bloat.
+13. **[OpenClaw CLI Loop-Stall & Log Pruning](file:///home/tim/dev/projects/openrouter-mcp/templates/system-prompt-addendums/13-openclaw-cli-loop-pruning.md):** Formulates terminal hygiene policies to prevent compilation locks and strip noise from test results.
+14. **[Structured Planning & JSON Chaining](file:///home/tim/dev/projects/openrouter-mcp/templates/system-prompt-addendums/14-hermes-structured-tool-chaining.md):** Instructs Hermes-type JSON function call engines to compress reasoning steps and accelerate tool parallel execution.
 
 Copy and paste these templates directly into your bot's system instructions or configuration environment to get started.
 
