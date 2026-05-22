@@ -65,7 +65,7 @@ This table shows which tools each profile enables (✅) or disables (❌):
 | `set_budget` | ✅ | ✅ | ✅ | ✅ | ✅ |
 | `get_budget_status` | ✅ | ✅ | ✅ | ✅ | ✅ |
 | `correlate_errors` | ✅ | ✅ | ✅ | ✅ | ✅ |
-| `dependency_graph` | ❌ | ✅ | ✅ | ✅ | ✅ |
+| `dependency_graph` | ❌ | ✅ | ❌ | ❌ | ✅ |
 | `vision_analyze` | ❌ | ✅ | ❌ | ✅ | ✅ |
 | `index_project` | ❌ | ❌ | ❌ | ❌ | ✅ |
 | `search_symbols` | ❌ | ❌ | ❌ | ❌ | ✅ |

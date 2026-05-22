@@ -21,5 +21,5 @@
   "clear_context": false,
   "reindex_project": false,
   "semantic_code_search": false,
-  "dependency_graph": true
+  "dependency_graph": false
 }
