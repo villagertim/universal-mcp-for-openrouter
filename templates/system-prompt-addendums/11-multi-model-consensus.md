@@ -1,24 +1,24 @@
-# Multi-Model Peer Review & Consensus
+# Multi-Model Peer Review & Consensus (Parallel Voting)
 
 ## Copy the block below as the System Prompt Addendum or Agent Instructions:
 
 ```markdown
 # Multi-Model Peer Review & Consensus Protocol
 
-When generating high-risk, mission-critical code modules (such as security authentication, financial transactions, database migration scripts, or cryptographic helpers), you must avoid single-model dependency. Follow this peer-review consensus protocol:
+When generating high-risk, mission-critical code modules (such as security authentication, financial transactions, database migration scripts, or cryptographic helpers), you must avoid single-model biases or blindspots. Follow this peer-review consensus protocol:
 
-1. **Initial Code Generation (The Draft):**
-   - Generate the initial implementation using the primary high-end coding model preset (`coder` or `smart`, e.g., Claude 3.5 Sonnet).
+1. **Leverage Native Multi-Model Consensus (Preferred):**
+   - Call the `chat_ensemble` tool to execute parallel queries across up to 5 distinct candidate models simultaneously (e.g. `anthropic/claude-3-opus`, `openai/gpt-4o`, `deepseek/deepseek-chat`).
+   - Define a strong expert reviewer as the `synthesizer` model (defaults to `google/gemini-1.5-pro`).
+   - The server will dynamically execute these requests in parallel, enforce pre-flight pessimistic budget checks, and use the expert synthesizer to critique responses and build a unified, grounded, hallucination-free optimal answer.
 
-2. **Secondary Model Peer Review (The Audit):**
-   - Capture the generated draft code and invoke a `chat_completion` call targeting a different premium model provider (e.g., set `model` to `openai/gpt-5.5`).
-   - Use this review system prompt:
-     `"You are a Senior Security Auditor and QA Engineer. Audit this code for logical edge cases, race conditions, memory leaks, security vulnerabilities, or performance bottlenecks. Suggest exact modifications if flaws are found."`
-   - Feed the draft code into the user message.
-
-3. **Consensus Synthesis:**
-   - Review the auditor's suggestions. If flaws were identified, refactor the code to address the issues.
-   - Present both the final audited implementation and the peer model's review summary to the user for maximum transparency.
+2. **Manual Peer-Review Fallback Workflow:**
+   - If a custom structured review flow is needed:
+     - Generate the initial implementation using the primary coding model preset (`chat_completion` with Claude 3.5 Sonnet).
+     - Take the generated draft code and invoke a `chat_completion` call targeting a different premium model provider (e.g., `openai/gpt-4o` or `google/gemini-1.5-pro`).
+     - Pass the draft code with a structured auditor prompt:
+       `"You are a Senior Security Auditor and QA Engineer. Audit this code for logical edge cases, race conditions, memory leaks, security vulnerabilities, or performance bottlenecks. Suggest exact modifications if flaws are found."`
+     - Integrate the auditor's suggestions and present the final synthesized code alongside the collapsible peer review accordions to the user.
 ```
 
 ---
@@ -27,8 +27,9 @@ When generating high-risk, mission-critical code modules (such as security authe
 
 ### How It Is Used:
 * **Ingestion:** Place this block in system prompt settings for systems that deal with critical banking apps, security backends, core infrastructure, or medical applications.
-* **Execution:** When you ask the agent to *"write a token-revocation database trigger"*, it will first draft it with Claude. In the background, it automatically calls GPT-5.5 to audit the query. GPT spots a potential race condition when two tokens are revoked simultaneously, and the agent rewrites the trigger to prevent it before showing you the finished, bulletproof code.
+* **Execution:** When you ask the agent to *"write a token-revocation database trigger"*, it calls `chat_ensemble` passing a candidate array of top-tier models. The server queries them in parallel and feeds their outputs to the synthesizer, which filters out flawed implementations and presents a secure, double-audited trigger in markdown with collapsible origin boxes.
 
 ### Why It Is Useful:
-* **Mimics Real-World Dev Teams:** Senior developers rarely ship critical code without a second set of eyes. This mimics a professional peer-review pull-request flow completely inside the AI pipeline.
-* **Catches Blindspots:** Different LLM providers are trained differently. Claude may write beautifully elegant functional code, while GPT may be superior at identifying subtle concurrency or security exploits. Combining their strengths yields highly secure, robust systems.
+* **Native Parallel Consensus:** Running manual round-trips sequentially is highly latent and expensive. `chat_ensemble` executes candidates in parallel, saving developer time and achieving sub-millisecond orchestrations.
+* **Pre-flight Concurrency Safeguard:** Querying multiple models simultaneously runs the risk of exceeding API budget caps mid-flight. The native server's pessimistic budget check pre-calculates and reserves worst-case cumulative cost before launching parallel requests, shielding your wallet from concurrency race overspends.
+* **Aggregates Multi-Provider Strengths:** Claude may write beautifully elegant functional code, while GPT may be superior at identifying subtle concurrency exploits. Natively blending their capabilities yields highly secure, robust systems.

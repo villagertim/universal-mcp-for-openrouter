@@ -8,7 +8,7 @@ This guide explains how to run, verify, and contribute tests for each platform p
 
 ```bash
 # Clone the repository
-git clone https://github.com/[TBD]/universal-mcp-for-openrouter.git
+git clone https://github.com/tim/universal-mcp-for-openrouter.git
 cd universal-mcp-for-openrouter
 
 # Install dependencies

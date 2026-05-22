@@ -31,6 +31,9 @@ import { registerAnalysisTools } from "./tools/analysis.js";
 import { registerBudgetTools } from "./tools/budget.js";
 import { registerVerifyTools } from "./tools/verify.js";
 
+// Background Watcher Infrastructure
+import { initializeWatcher, closeAllWatchers } from "./helpers/watcher.js";
+
 // Redirect all console.log to stderr to prevent corrupting the MCP stdout stream
 console.log = (...args) => console.error(...args);
 
@@ -84,6 +87,7 @@ class OpenRouterServer {
     // Error handling
     this.server.onerror = (error) => console.error("[MCP Error]", error);
     process.on("SIGINT", async () => {
+      closeAllWatchers();
       await this.server.close();
       process.exit(0);
     });
@@ -108,6 +112,11 @@ class OpenRouterServer {
 
     // 5. Background tasks
     refreshPricingCache(this.ctx);
+
+    // 6. Start real-time incremental watch engine
+    initializeWatcher(this.ctx).catch(err => {
+      console.error("[Watcher] Startup failed:", err);
+    });
   }
 
   private setupHandlers(config: ToolConfig, profileName: string) {

@@ -97,11 +97,23 @@ This prevents accidental exposure of credentials to external network suppliers. 
 
 ## Usage Guide
 
-### Basic Completions
+### Basic & Smart Chat Completions
 
 ```
-chat_completion(prompt: "Explain how JWT refresh tokens work")
+# Direct Model completions (custom or auto)
+chat_completion(prompt: "Explain how JWT refresh tokens work", model: "anthropic/claude-3-5-sonnet")
+
+# Thin preset completion (smart, cheap, fast, coder, creative)
 chat_with_preset(preset: "fast", prompt: "Summarize this in 3 bullets: ...")
+
+# Intelligent dynamic routing (evaluates budget constraints and circuit breakers)
+chat_routed(prompt: "Write a high-performance HTTP gateway", strictness: "quality")
+
+# Parallel Multi-Model Consensus Peer Review (polls up to 5 models concurrently)
+chat_ensemble(
+  models: ["deepseek/deepseek-chat", "anthropic/claude-3.5-sonnet", "google/gemini-1.5-pro"],
+  prompt: "Auditing constant-time cryptographic checks for timing attacks"
+)
 ```
 
 ### Budget Safety (set this first)
@@ -113,16 +125,16 @@ get_budget_status()
 
 The budget cap is enforced **before** each API call fires. Configuration survives server restarts (`rate_config.json`). Circuit breakers open automatically after 3 consecutive failures on a model and reset after 60 seconds.
 
-### Semantic Code Search (two-step workflow)
+### Semantic Code Search (incremental background watch indexing)
 
 ```
-# Step 1 — index the project (fast, no API calls)
+# Step 1 — index the project (spins up real-time background file watchers)
 index_project(project_path: "/path/to/repo", project_name: "my-api")
 
-# Step 2 — embed code chunks (calls OpenRouter embeddings API)
+# Step 2 — embed code chunks (uses MD5 checks to execute cost-free incremental reindexing)
 reindex_project(project_name: "my-api")
 
-# Step 3 — search by intent
+# Step 3 — semantic search
 semantic_code_search(query: "where do we handle auth token expiry")
 ```
 
@@ -138,6 +150,22 @@ pin_context(
 
 # Retrieve relevant context later
 retrieve_context(query: "how does authentication work", top_k: 3)
+```
+
+### Deep Transitive Auditing & Diagnostics
+
+```
+# Parse lockfiles in sub-milliseconds and trace co-existing semver conflicts
+dependency_graph(transitive: true, check_conflicts: true)
+
+# Trace targeted deep dependency paths leading to a specific package
+dependency_graph(transitive: true, focus_package: "lodash", max_depth: 5)
+
+# Multi-service log correlation and cascading fault root-cause analysis
+correlate_errors(logs: [
+  { system_name: "API Gateway", content: "ERROR: Connection timeout after 30s" },
+  { system_name: "Database Server", content: "WARN: Connection pool exhausted (100/100)" }
+])
 ```
 
 ------
@@ -162,6 +190,8 @@ To help your agentic coding assistants (like Claude Code, OpenClaw, or Hermes) m
 14. **[Structured Planning & JSON Chaining](file:///home/tim/dev/projects/openrouter-mcp/templates/system-prompt-addendums/14-hermes-structured-tool-chaining.md):** Instructs Hermes-type JSON function call engines to compress reasoning steps and accelerate tool parallel execution.
 15. **[Diagnostic Self-Healing & Pre-Flight Integration](file:///home/tim/dev/projects/openrouter-mcp/templates/system-prompt-addendums/15-diagnostic-self-healing.md):** Mandates early setup diagnostic checks and reactive troubleshooting to handle budget or runtime failures gracefully.
 16. **[High-Context Codebase Navigation & Model Slicing](file:///home/tim/dev/projects/openrouter-mcp/templates/system-prompt-addendums/16-high-context-catalog-slicing.md):** Dynamically estimates file token sizes to query and select the most budget-efficient high-context models.
+17. **[Real-Time Semantic Context & Background Indexing](file:///home/tim/dev/projects/openrouter-mcp/templates/system-prompt-addendums/17-realtime-semantic-watcher.md):** Instructs the agent to rely on automatic background filesystem watching and line-shift resilient incremental re-indexing, avoiding manual indexing commands.
+18. **[Zero-Cost Local Proxy & Resilient Fallback Routing](file:///home/tim/dev/projects/openrouter-mcp/templates/system-prompt-addendums/18-local-proxy-overrides.md):** Teaches the agent to leverage local model endpoints for free routine generations while ensuring transparent remote LLM failover.
 
 Copy and paste these templates directly into your bot's system instructions or configuration environment to get started.
 

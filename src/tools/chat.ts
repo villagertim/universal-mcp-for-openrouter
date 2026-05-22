@@ -9,10 +9,12 @@ import {
   RecommendModelArgs, 
   OptimizePromptArgs,
   ChatEnsembleArgs,
+  ChatRoutedArgs,
 } from "../types.js";
 import { PRESETS, DEFAULT_SYNTHESIZER_MODEL } from "../config.js";
 import { guardedCompletionPost, checkPessimisticBudget } from "../helpers/rate-guard.js";
 import { trackUsage } from "../helpers/pricing.js";
+import { RouterEngine } from "../helpers/router.js";
 
 export function registerChatTools(ctx: ServerContext) {
   const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY?.trim();
@@ -146,6 +148,52 @@ export function registerChatTools(ctx: ServerContext) {
         },
         required: ["models", "prompt"]
       }
+    },
+    {
+      name: "chat_routed",
+      description: "Execute a chat completion with intelligent, automatic cost-aware model routing based on prompt size, required context length, and task attributes.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          prompt: {
+            type: "string",
+            description: "The main prompt to run"
+          },
+          system_prompt: {
+            type: "string",
+            description: "Optional system prompt"
+          },
+          task_category: {
+            type: "string",
+            enum: ["general", "code", "creative", "vision"],
+            description: "The general category of the task"
+          },
+          max_usd_price_per_1m_prompt: {
+            type: "number",
+            description: "Strict maximum cost in USD per 1M prompt tokens (e.g., 2.50)"
+          },
+          require_vision: {
+            type: "boolean",
+            description: "Whether the model must support image/vision inputs"
+          },
+          strictness: {
+            type: "string",
+            enum: ["cost", "quality"],
+            description: "Routing prioritization strategy. 'cost' prefers the absolute cheapest; 'quality' weights model performance tiers.",
+            default: "cost"
+          },
+          temperature: {
+            type: "number",
+            description: "Sampling temperature (0-2)",
+            default: 0.7
+          },
+          max_tokens: {
+            type: "number",
+            description: "Maximum tokens to generate"
+          }
+        },
+        required: ["prompt"]
+      }
     }
   ];
 
@@ -157,6 +205,7 @@ export function registerChatTools(ctx: ServerContext) {
       recommend_model: handleRecommendModel,
       optimize_prompt: handleOptimizePrompt,
       chat_ensemble: handleChatEnsemble,
+      chat_routed: handleChatRouted,
     }
   };
 
@@ -224,15 +273,73 @@ export function registerChatTools(ctx: ServerContext) {
 
   async function handleChatWithPreset(args: ChatWithPresetArgs) {
     const { preset, prompt, system_prompt } = args;
-    const presetModels = PRESETS[preset];
-    if (!presetModels) throw new McpError(ErrorCode.InvalidParams, `Unknown preset: ${preset}`);
-
-    return handleChatCompletion({
-      model: presetModels[0],
-      models: presetModels.slice(1),
+    
+    let strictness: "cost" | "quality" = "cost";
+    let task_category: "general" | "code" | "creative" = "general";
+    
+    if (preset === "smart" || preset === "coder") {
+      strictness = "quality";
+      task_category = "code";
+    } else if (preset === "creative") {
+      strictness = "quality";
+      task_category = "creative";
+    }
+    
+    return handleChatRouted({
       prompt,
-      system_prompt
+      system_prompt,
+      strictness,
+      task_category
     });
+  }
+
+  async function handleChatRouted(args: ChatRoutedArgs & { temperature?: number; max_tokens?: number }) {
+    const {
+      prompt,
+      system_prompt,
+      task_category,
+      max_usd_price_per_1m_prompt,
+      require_vision,
+      strictness = "cost",
+      temperature = 0.7,
+      max_tokens
+    } = args;
+
+    const { candidates, reason } = RouterEngine.selectCandidates(ctx, {
+      prompt,
+      system_prompt,
+      task_category,
+      max_usd_price_per_1m_prompt,
+      require_vision,
+      strictness
+    });
+
+    if (candidates.length === 0) {
+      return {
+        content: [{ type: "text", text: `Error: No matching models found. Reason: ${reason}` }],
+        isError: true
+      };
+    }
+
+    const completionResult = await handleChatCompletion({
+      model: candidates[0],
+      models: candidates.slice(1),
+      prompt,
+      system_prompt,
+      temperature,
+      max_tokens
+    });
+
+    if (completionResult.isError) {
+      return completionResult;
+    }
+
+    const responseContent = [...completionResult.content];
+    const metadataText = `\n\n---\n### 🎯 Dynamic Routing Telemetry\n* **Routing Decision:** ${reason}\n* **Fallback Priority List:**\n  ${candidates.map((c, idx) => `${idx + 1}. \`${c}\``).join("\n  ")}\n* **Cost Constraints:** ${max_usd_price_per_1m_prompt ? `Max $${max_usd_price_per_1m_prompt}/1M prompt` : "None"}\n* **Target Strictness:** \`${strictness}\` (Category: \`${task_category || "general"}\`)`;
+    
+    responseContent.push({ type: "text", text: metadataText } as const);
+
+    return { content: responseContent };
   }
 
   async function handleRecommendModel(args: RecommendModelArgs) {

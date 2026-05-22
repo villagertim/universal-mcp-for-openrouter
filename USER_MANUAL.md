@@ -296,23 +296,31 @@ Recent usage:
 
 ---
 
-### 1.3 The 22 Tools at a Glance
+### 1.3 The 24 Tools at a Glance
 
-The OpenRouter MCP server provides exactly 22 tools, organized into seven domains:
+The OpenRouter MCP server provides exactly 24 tools, organized into eight domains:
 
-**Chat Tools (2)**
+**Chat Tools (4)**
 | Tool | What It Does |
 |------|-------------|
 | `chat_completion` | Send a message to any AI model |
 | `chat_with_preset` | Use a pre-configured model profile |
+| `chat_routed` | Execute chat with dynamic, cost-aware model routing |
+| `chat_ensemble` | Query multiple models in parallel and synthesize consensus |
 
-**Model and Account Tools (4)**
+**Model Catalog Tools (3)**
 | Tool | What It Does |
 |------|-------------|
 | `list_models` | See all available AI models |
+| `filter_models` | Search/filter models by context window, cost, or vision |
 | `recommend_model` | Get a model recommendation for your task |
+
+**Account and Usage Tools (3)**
+| Tool | What It Does |
+|------|-------------|
 | `get_balance` | Check your account balance |
 | `get_key_info` | See details about your API key |
+| `get_session_usage` | See token usage and cost for the current session |
 
 **Memory and Context Tools (3)**
 | Tool | What It Does |
@@ -340,15 +348,20 @@ The OpenRouter MCP server provides exactly 22 tools, organized into seven domain
 |------|-------------|
 | `vision_analyze` | Analyze images with AI |
 
-**Budget Tools (4)**
+**Budget & Performance Tools (3)**
 | Tool | What It Does |
 |------|-------------|
 | `set_budget` | Configure spending limits and warnings |
 | `get_budget_status` | Check current budget usage |
-| `get_session_usage` | See costs for the current session |
 | `optimize_prompt` | Reduce token usage without losing quality |
 
+**Diagnostic Tools (1)**
+| Tool | What It Does |
+|------|-------------|
+| `verify_setup` | Run self-healing environment diagnostics |
+
 ---
+
 
 ### 1.4 How the Tools Connect
 
@@ -656,6 +669,32 @@ echo $OPENROUTER_API_KEY
 ```
 
 You should see your key printed. If you see nothing, the variable was not set correctly.
+
+---
+
+### 3.3b Local Proxy Routing & Cost-Free Execution
+
+To support cost-free local workflows (e.g., matching the Cost-Aware Routing Blueprint), the server can route requests to a local model proxy instead of calling the external OpenRouter APIs.
+
+**Configuration:**
+Set the `PREFER_LOCAL_MODEL` environment variable:
+* `PREFER_LOCAL_MODEL=true`: Tells the intelligent routing engine (`chat_routed`) to prepend a local proxy target (`openrouter-auto` routing to `http://localhost:4002/v1`) as the primary candidate. If the local proxy is online, it will receive the request, avoiding OpenRouter API costs.
+
+Example configuration in `mcpServers` (e.g., under Google Antigravity or Claude Code):
+```json
+{
+  "mcpServers": {
+    "openrouter": {
+      "command": "universal-mcp-for-openrouter",
+      "args": ["--profile", "antigravity"],
+      "env": {
+        "OPENROUTER_API_KEY": "${OPENROUTER_API_KEY}",
+        "PREFER_LOCAL_MODEL": "true"
+      }
+    }
+  }
+}
+```
 
 ---
 
@@ -1042,6 +1081,144 @@ The model's response, formatted according to the preset's configuration.
 - The `coder` preset automatically uses a low temperature, so you do not need to specify it.
 - The `creative` preset uses a higher temperature — if you need more controlled creative output, use `chat_completion` directly with a custom temperature.
 - Presets are the fastest way to get good results. Use `chat_completion` directly only when you need control that presets do not provide.
+
+---
+
+### Tool 2b: `chat_routed` (Intelligent Model-Task Routing)
+
+**What it does:**
+Executes a chat completion using the server's **Intelligent Middleware Layer**. Instead of manually specifying model IDs or using static presets, the server dynamically evaluates prompt size, required context length, vision capabilities, price caps, and circuit-breaker states. It queries the local catalog to find the cheapest *eligible* models, ranks them, and cascades execution down this dynamic list, returning rich telemetry data back to the client.
+
+**When to use it:**
+- When you want to minimize costs while ensuring the model has sufficient context and capabilities.
+- When you want automatic failover between eligible models if your primary choice is rate-limited or offline.
+- When you want to enforce strict prompt price limits (e.g., maximum cost in USD per 1M prompt tokens).
+- When you want cost-free local model proxy execution (`PREFER_LOCAL_MODEL=true`) whenever a local model endpoint is online on port 4002.
+
+**Parameters:**
+
+| Parameter | Required | Type | Default | Description |
+|-----------|----------|------|---------|-------------|
+| `prompt` | **Yes** | string | — | The message to send |
+| `system_prompt` | No | string | — | Additional instructions to shape the response |
+| `task_category` | No | enum | `"general"` | One of: `"general"`, `"code"`, `"creative"`, `"vision"` |
+| `max_usd_price_per_1m_prompt` | No | number | — | Strict maximum cost in USD per 1M prompt tokens (e.g., `2.50`) |
+| `require_vision` | No | boolean | `false` | If `true`, only models supporting vision/images will be eligible |
+| `strictness` | No | enum | `"cost"` | Strategy: `"cost"` (cheapest eligible first) or `"quality"` (tiers first, then cheapest) |
+| `temperature` | No | number | `0.7` | Sampling temperature (0-2) |
+| `max_tokens` | No | number | — | Maximum tokens to generate |
+
+**How it works — The Intelligent Cascading & Routing Process:**
+1. **Dynamic Token Estimation:** Standardizes prompt size without heavy dependencies using character and word frequency statistics.
+2. **Context-Size Slicing:** Filters out models whose maximum context length is too small to safely handle the prompt + output buffer (4,000 token headroom buffer).
+3. **Circuit-Breaker Exclusion:** Automatically skips models whose circuit breakers are currently tripped due to recent API errors.
+4. **Strategy Sorting:**
+   - **Cost Mode (Default):** Strictly sorts all remaining candidates by prompt price ascending.
+   - **Quality Mode:** Classifies candidates into performance tiers (Tier 1: Frontier Models, Tier 2: Flash Models) and prioritizes top-tier candidates, sorted by cost ascending within their tier.
+5. **Local Override Prepend:** If the environment variable `PREFER_LOCAL_MODEL=true` is set, a local proxy option (`openrouter-auto` routing to `http://localhost:4002/v1`) is prepended as the absolute first choice. If port 4002 is active, it runs cost-free!
+6. **Robust Failover Execution:** Automatically cascades to the next candidate model if the chosen model fails.
+7. **Rich Telemetry Returns:** Appends a structured `routing_metadata` payload in the output:
+   - `model_selected`: The actual model that successfully handled the prompt.
+   - `prompt_tokens_estimated`: Estimated input token count.
+   - `cost_per_1m_prompt_usd`: Prompt pricing for the selected model.
+   - `routing_reason`: Descriptive text about the routing decision.
+   - `candidates_considered`: List of model IDs evaluated by the routing engine.
+   - `failover_models_tried`: List of model IDs that failed before a success occurred.
+
+**Example Request:**
+```json
+{
+  "prompt": "Write a highly optimized TypeScript matrix multiplication function.",
+  "task_category": "code",
+  "strictness": "quality",
+  "max_usd_price_per_1m_prompt": 5.00
+}
+```
+
+**Example Telemetry Return Structure:**
+In addition to the generated chat completion, the tool returns detailed metadata:
+```json
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "[Generated Response...]"
+    }
+  ],
+  "routing_metadata": {
+    "model_selected": "anthropic/claude-3-5-sonnet",
+    "prompt_tokens_estimated": 128,
+    "cost_per_1m_prompt_usd": 3.0,
+    "routing_reason": "Quality mode selected anthropic/claude-3-5-sonnet from Tier 1 (frontier models) as the most cost-efficient candidate within budget.",
+    "candidates_considered": [
+      "anthropic/claude-3-5-sonnet",
+      "google/gemini-1.5-pro",
+      "meta-llama/llama-3.1-405b"
+    ],
+    "failover_models_tried": []
+  }
+}
+```
+
+---
+
+### Tool 2c: `chat_ensemble` (Consensus Multi-Model Review)
+
+**What it does:**
+Executes a highly resilient **Parallel Multi-Model Consensus Audit**. Instead of relying on a single AI model, this tool queries up to 5 distinct models simultaneously. It aggregates their responses and feeds them into an expert synthesis model (by default, `google/gemini-1.5-pro`) acting as a master peer reviewer. The synthesizer critiques the candidate responses, resolves logical contradictions, and synthesizes a single, optimal, hallucination-free consensus answer.
+
+**When to use it:**
+- For **mission-critical tasks** requiring extreme accuracy, such as scanning security-sensitive code, diagnosing complex system architectures, or auditing contracts.
+- When you want to eliminate the specific logical blindspots or biases of any single AI provider.
+- When you want a structured peer-review panel that compares different reasoning models (e.g., Anthropic, DeepSeek, and Google) on a single problem.
+
+**Parameters:**
+
+| Parameter | Required | Type | Default | Description |
+|-----------|----------|------|---------|-------------|
+| `models` | **Yes** | array of strings | — | Up to 5 model IDs to query in parallel (e.g., `["deepseek/deepseek-chat", "anthropic/claude-3.5-sonnet"]`) |
+| `prompt` | **Yes** | string | — | The main task prompt to send to all models |
+| `system_prompt` | No | string | — | Optional system prompt shaping candidate behavior |
+| `synthesizer_model` | No | string | `"google/gemini-1.5-pro"` | The expert peer-reviewer model used to critique and merge outputs |
+| `temperature` | No | number | `0.7` | Sampling temperature (0-2) for candidate queries |
+| `max_tokens` | No | number | — | Maximum tokens to generate per candidate response |
+
+**How it works — Consensus Synthesis Engine:**
+1. **Pessimistic Budget Reservation:** To prevent runaway expenses, the server calculates a "pessimistic spend cap" for all requested models and the synthesizer *before* firing. If the collective cap violates your configured session budget, the tool aborts instantly before executing any API call.
+2. **Parallel Dispatch:** Concurrently executes network requests across all candidate models to keep execution times as fast as possible.
+3. **Synthesis Instruction formulation:** Packages all successful candidate outputs into a structured prompt, using strict grounding guidelines:
+   - Base final output strictly on candidate facts.
+   - Extract source code chunks and resolve contradictions logically.
+   - Ban unverified claims and hallucinations.
+4. **Accordion Telemetry Log:** Appends a collapsible `<details>` accordion block containing the exact raw responses of each contributing model for absolute auditing transparency.
+
+**Example Request:**
+```json
+{
+  "models": ["deepseek/deepseek-chat", "anthropic/claude-3.5-sonnet", "google/gemini-1.5-pro"],
+  "prompt": "Evaluate this JavaScript code block for timing attacks: if (input === password) { return true; }"
+}
+```
+
+**Example Telemetry Return Structure:**
+```json
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "[Synthesized Expert Consensus Review explaining why constant-time string comparisons are needed...]"
+    },
+    {
+      "type": "text",
+      "text": "\n\n---\n### Ensemble Synthesis Metadata\n* **Synthesizer:** google/gemini-1.5-pro\n* **Contributing Models:**\n* **deepseek/deepseek-chat** (Success, Latency: 1845ms)\n* **anthropic/claude-3.5-sonnet** (Success, Latency: 2210ms)\n* **google/gemini-1.5-pro** (Success, Latency: 1402ms)"
+    },
+    {
+      "type": "text",
+      "text": "\n\n<details>\n<summary>🔍 View Original Candidate Responses</summary>\n\n### Original Output from **deepseek/deepseek-chat**:\n[Raw text...]\n\n### Original Output from **anthropic/claude-3.5-sonnet**:\n[Raw text...]\n\n</details>"
+    }
+  ]
+}
+```
 
 ---
 
@@ -1600,6 +1777,8 @@ Indexed project: my-app
 - Indexing large projects can take a minute or two. This is normal.
 - **Tilde Path Expansion:** You can use the standard tilde prefix (`~` or `~/`) in `project_path` to refer to your home directory (e.g., `~/dev/my-project`). The server will automatically expand it to the correct absolute system path (e.g., `/home/username/dev/my-project` or `/Users/username/dev/my-project`) on both Linux and macOS.
 - **100% Path Portability:** The indexer stores all file references as relative paths from the project root. When you or another developer run symbol searches later, the server dynamically reconstructs absolute paths relative to the project directory or current workspace. This makes your symbol database (`symbol_index.json`) fully portable across machines.
+- **Real-time Background File Watchers:** Once you call `index_project`, the server automatically spins up a real-time background file watcher (`fs.watch`) bound to the project path. Any subsequent file edits, creations, or deletions are instantly detected and processed.
+- **Incremental Cost-Free Indexing:** The background watcher computes local MD5 hashes for file chunks. When checking for modifications, it compares new hashes to previously indexed ones. Only chunks with changed code content are sent to OpenRouter's embeddings API, making continuous code updates virtually cost-free and shielding you from unwanted token charges.
 - The `project_name` you choose will be used in `search_symbols`, `semantic_code_search`, and `reindex_project`. Choose something memorable and consistent.
 - The index is stored locally. It does not send your code to any external service beyond what is needed for embedding generation.
 - If your project changes significantly, use `reindex_project` to update the index.
@@ -1871,7 +2050,7 @@ Based on this, the server receives:
 ### Tool 15: `dependency_graph`
 
 **What it does:**
-Analyzes shared dependencies and version conflicts across multiple projects you've indexed.
+Analyzes shared dependencies and version conflicts across multiple projects you've indexed, supporting deep transitive resolution via lockfiles and targeted trace graphing.
 
 **Parameters:**
 
@@ -1880,17 +2059,63 @@ Analyzes shared dependencies and version conflicts across multiple projects you'
 | `repos` | No | array of strings | All indexed | List of project names to analyze |
 | `check_conflicts` | No | boolean | false | Run semver conflict detection |
 | `include_dev` | No | boolean | false | Include devDependencies in analysis |
+| `transitive` | No | boolean | false | Enable deep transitive lockfile dependency auditing (`package-lock.json` and `Cargo.lock`) |
+| `focus_package` | No | string | — | Trace all deep dependency chains leading to this specific package and print graph routes back to roots |
+| `max_depth` | No | integer | 5 | Maximum depth for dependency path tracing |
 
 **How to ask for it:**
-> "Check if there are any dependency version conflicts across my frontend and backend projects."
+> "Audit transitive dependency conflicts across my projects using lockfiles."
+> "Trace all deep dependency chains leading to the package `mime-types` across my node projects."
 
 Based on this, the server receives:
 ```json
 {
   "repos": ["frontend", "backend"],
-  "check_conflicts": true
+  "check_conflicts": true,
+  "transitive": true
 }
 ```
+Or for targeted tracing:
+```json
+{
+  "transitive": true,
+  "focus_package": "mime-types",
+  "max_depth": 5
+}
+```
+
+**How it works — Zero-Timeout Transitive Auditing:**
+1. **Direct Lockfile Parsing:** Traditional auditing utilities execute heavy child-process commands (like `npm ls` or `cargo tree`) which are slow, environment-dependent, and prone to timeouts. The OpenRouter MCP server parses `package-lock.json` and `Cargo.lock` directly in-process via optimized, high-performance AST and regex parsers, resolving entire graphs in sub-milliseconds.
+2. **Directed Acyclic Graph (DAG) Resolution:** Reconstructs the full dependency tree. If a `focus_package` is specified, it runs a depth-first search (DFS) to trace and print all dependency chains from root-level projects down to that specific package.
+3. **Semver Intersection Verification:** Resolves duplicated library declarations and runs `semver.intersects` checks. If incompatible shared version ranges are found across different projects in a monorepo, it automatically reports them as critical version conflicts.
+
+**What you get back — Example Audit Report:**
+```markdown
+## 📊 Summary
+Analyzed 2 repos. Scanned 457 unique package definitions (direct + transitive). Found 18 shared/duplicated packages and 1 conflict groups.
+
+## 📁 Repositories
+| Project | Resolver | Scanned Items |
+|:---|:---|:---|
+| frontend | npm (lockfile) | 382 (transitive) |
+| backend | npm (lockfile) | 75 (transitive) |
+
+## 🤝 Shared & Duplicated Packages
+- **lodash**: Used in frontend (4.17.21), backend (4.17.15)
+- **axios**: Used in frontend (^1.6.0), backend (^0.27.0)
+
+## 🔴 Transitive Semver Conflicts
+### ⚠️ axios
+- **Version `^1.6.0`** (in project `frontend`):
+  `frontend` ➔ `axios`
+- **Version `^0.27.0`** (in project `backend`):
+  `backend` ➔ `axios`
+```
+
+**Tips:**
+- **Transitive Auditing Mode:** Always set `"transitive": true` when analyzing modern projects to scan deep dependencies. Without it, the tool falls back to quick direct-dependency scans of manifest files (`package.json` and `Cargo.toml`).
+- **Path Tracing Depth:** Use `max_depth` to prevent deep transitively recursive loops from cluttering your graphs. A default of `5` is typically optimal.
+- **Pre-commit Auditing:** Run `dependency_graph` as part of your local pre-commit workflow to prevent introducing incompatible libraries or duplicated package versions into your monorepo.
 
 ---
 
@@ -2223,12 +2448,14 @@ Complex Task + Large Model = ✅ Appropriate (justified)
 
 ## Chapter 14: Quick Reference — The Cheat Sheet
 
-### 14.1 All 22 Tools at a Glance
+### 14.1 All 24 Tools at a Glance
 
 | # | Tool | Category | Key Input | What It Does |
 |---|---|---|---|---|
 | 1 | `chat_completion` | Chat | `prompt` | Send a prompt to any model |
 | 2 | `chat_with_preset` | Chat | `preset`, `prompt` | Send using a named preset |
+| 2b | `chat_routed` | Chat | `prompt` | Execute chat with dynamic, cost-aware model routing |
+| 2c | `chat_ensemble` | Chat | `models`, `prompt` | Query multiple models in parallel and synthesize consensus |
 | 3 | `recommend_model` | Chat | `task` | Get a preset recommendation |
 | 4 | `optimize_prompt` | Chat | `prompt` | Improve a draft prompt |
 | 5 | `list_models` | Models | (none) | Browse all available models |

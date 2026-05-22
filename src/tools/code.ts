@@ -15,6 +15,7 @@ import { SYMBOL_INDEX_PATH, CODE_TAG, CODE_EMBEDDING_MODEL, CODE_CHUNK_LINES, CO
 import { getEmbedding, cosineSimilarity } from "../helpers/embeddings.js";
 import { loadContextStore, saveContextStore } from "../helpers/context-store.js";
 import { validatePath, resolveHomePath } from "../helpers/path-utils.js";
+import { watchProject } from "../helpers/watcher.js";
 import fs from "fs/promises";
 import path from "path";
 import { createHash } from "crypto";
@@ -117,6 +118,12 @@ export function registerCodeTools(ctx: ServerContext) {
       try { currentIndex = JSON.parse(await fs.readFile(SYMBOL_INDEX_PATH, "utf-8")); } catch (e) {}
       currentIndex[project_name] = { path: resolvedPath, symbols, lastIndexed: new Date().toISOString() };
       await fs.writeFile(SYMBOL_INDEX_PATH, JSON.stringify(currentIndex, null, 2));
+
+      // Start background real-time watches dynamically
+      watchProject(ctx, project_name, resolvedPath).catch(err => {
+        console.error(`[Watcher] Dynamic watch binding failed for "${project_name}":`, err.message);
+      });
+
       return { content: [{ type: "text", text: `Indexed ${symbols.length} symbols in "${project_name}".` }] };
     } catch (error: any) {
       return { content: [{ type: "text", text: `Error: ${error.message}` }], isError: true };
@@ -155,14 +162,7 @@ export function registerCodeTools(ctx: ServerContext) {
       if (!index[project_name]) throw new Error(`Project "${project_name}" not found.`);
       const projectPath = index[project_name].path;
       const store = await loadContextStore();
-      const existingMap = new Map<string, ContextEntry>();
-      
-      for (const e of store) {
-        if (e.tag === CODE_TAG && e.project === project_name) {
-          const relativeFile = path.isAbsolute(e.file!) ? path.relative(projectPath, e.file!) : e.file!;
-          existingMap.set(`${relativeFile}:${e.start_line}`, e);
-        }
-      }
+      const previousProjectEntries = store.filter(e => e.tag === CODE_TAG && e.project === project_name);
       
       let added = 0, unchanged = 0;
       const newEntries: ContextEntry[] = [];
@@ -173,34 +173,82 @@ export function registerCodeTools(ctx: ServerContext) {
           if (f.isDirectory()) { if (!CODE_SKIP_DIRS.has(f.name)) await walk(res); }
           else if (CODE_SOURCE_EXTS.has(path.extname(f.name))) {
             const relativeFile = path.relative(projectPath, res);
-            const lines = (await fs.readFile(res, "utf-8")).split("\n");
+            const fileEntries = previousProjectEntries.filter(e => e.file === relativeFile);
+            const content = await fs.readFile(res, "utf-8");
+            const lines = content.split("\n");
+
+            // 1. Identify all previous chunks that can be reused because their text is exactly present in the content.
+            const reusedEntries: ContextEntry[] = [];
+            const coveredLines = new Set<number>(); // 1-indexed line numbers
+
+            for (const entry of fileEntries) {
+              if (!entry.text || entry.text.length < 30) continue;
+              const idx = content.indexOf(entry.text);
+              if (idx !== -1) {
+                const startLine = content.substring(0, idx).split("\n").length;
+                const linesInChunk = entry.text.split("\n").length;
+                const endLine = startLine + linesInChunk - 1;
+
+                reusedEntries.push({
+                  ...entry,
+                  start_line: startLine,
+                  end_line: endLine,
+                  timestamp: new Date().toISOString()
+                });
+                unchanged++;
+
+                for (let l = startLine; l <= endLine; l++) {
+                  coveredLines.add(l);
+                }
+              }
+            }
+
+            const reusedHashes = new Set(reusedEntries.map(e => e.hash));
+            newEntries.push(...reusedEntries);
+
+            // 2. Perform the standard stride-based chunking loop to find any new or modified sections.
             for (let s = 0; s < lines.length; s += CODE_CHUNK_STRIDE) {
               if (added + unchanged >= max_chunks) break;
               const text = lines.slice(s, s + CODE_CHUNK_LINES).join("\n").trim();
               if (text.length < 30) continue;
               const hash = createHash("md5").update(text).digest("hex");
-              
-              const existing = existingMap.get(`${relativeFile}:${s + 1}`);
-              if (existing && existing.hash === hash) { 
-                existing.file = relativeFile;
-                newEntries.push(existing); 
-                unchanged++; 
+
+              // If this chunk's hash is already in our reused entries, skip it
+              if (reusedHashes.has(hash)) {
+                continue;
               }
-              else {
-                const embedding = await getEmbedding(ctx, text, CODE_EMBEDDING_MODEL);
-                newEntries.push({ 
-                  id: `code_${Date.now()}_${Math.random()}`, 
-                  text, 
-                  tag: CODE_TAG, 
-                  embedding, 
-                  timestamp: new Date().toISOString(), 
-                  project: project_name, 
-                  file: relativeFile, 
-                  start_line: s + 1, 
-                  end_line: Math.min(s + CODE_CHUNK_LINES, lines.length), 
-                  hash 
-                });
-                added++;
+
+              // Check if covered
+              let uncoveredLines = 0;
+              const chunkStart = s + 1;
+              const chunkEnd = Math.min(s + CODE_CHUNK_LINES, lines.length);
+              for (let l = chunkStart; l <= chunkEnd; l++) {
+                if (!coveredLines.has(l)) {
+                  uncoveredLines++;
+                }
+              }
+
+              if (uncoveredLines === 0) {
+                continue;
+              }
+
+              const embedding = await getEmbedding(ctx, text, CODE_EMBEDDING_MODEL);
+              newEntries.push({
+                id: `code_${Date.now()}_${Math.random()}`,
+                text,
+                tag: CODE_TAG,
+                embedding,
+                timestamp: new Date().toISOString(),
+                project: project_name,
+                file: relativeFile,
+                start_line: chunkStart,
+                end_line: chunkEnd,
+                hash
+              });
+              added++;
+
+              for (let l = chunkStart; l <= chunkEnd; l++) {
+                coveredLines.add(l);
               }
             }
           }

@@ -129,6 +129,15 @@ export interface ChatWithPresetArgs {
   system_prompt?: string;
 }
 
+export interface ChatRoutedArgs {
+  prompt: string;
+  system_prompt?: string;
+  task_category?: "general" | "code" | "creative" | "vision";
+  max_usd_price_per_1m_prompt?: number;
+  require_vision?: boolean;
+  strictness?: "cost" | "quality";
+}
+
 export interface RecommendModelArgs {
   task: string;
 }
@@ -196,6 +205,9 @@ export interface DependencyGraphArgs {
   repos?: string[];
   check_conflicts?: boolean;
   include_dev?: boolean;
+  transitive?: boolean;
+  focus_package?: string;
+  max_depth?: number;
 }
 
 export interface SymbolEntry {
@@ -220,7 +232,7 @@ export interface PackageMapEntry {
 }
 
 export interface RepoInfo {
-  type: "npm" | "cargo" | "unknown";
+  type: "npm" | "cargo" | "unknown" | "npm (lockfile)" | "cargo (lockfile)";
   displayName: string;
   depCount?: number;
   stubbed?: boolean;

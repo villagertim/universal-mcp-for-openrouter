@@ -12,7 +12,7 @@ This is the **Finalized Post-Remediation Version** of the report, compiled after
 | :--- | :---: | :--- | :--- | :--- |
 | **🏗️ Maintainability** | **A** | - Domain-specific modularity<br>- Zero duplicate blocks<br>- Excellent code comments | - None | **Fully Aligned** |
 | **🛠️ Supportability** | **A** | - Global `stdout` safety guard<br>- Asynchronous database write queue<br>- Integrated diagnostics tool | - None | **Fully Aligned** |
-| **🚀 Upgradability & Portability** | **A** | - 100% relative path portability<br>- Tilde-expansion for local paths<br>- Default Axios timeout limits added | - None (Axios timeout vulnerability fully resolved) | **Fully Aligned** |
+| **🚀 Upgradability & Portability** | **A** | - 100% relative path portability<br>- Tilde and environment variable path expansion<br>- Default Axios timeout limits added | - None (Axios timeout vulnerability fully resolved) | **Fully Aligned** |
 | **⚖️ Best Practices & Security** | **A** | - Standard SPDX headers on all files<br>- Trademark-compliant descriptions<br>- Local pre-commit secret blocker | - None | **Fully Aligned** |
 
 ### 🏆 Overall Codebase Score: **100 / 100 (Grade: A)**
@@ -50,10 +50,16 @@ This is the **Finalized Post-Remediation Version** of the report, compiled after
 
 ## 🛠️ Completed Remediation Summary
 
-The two refinement recommendations highlighted in the initial audit run have been completely implemented:
+The refinement recommendations highlighted in the audit runs have been completely implemented:
 
 ### 1. Default Timeout on Axios Client
 Added `timeout: 60000` (60 seconds) directly to the central `axiosInstance` builder in [index.ts](file:///home/tim/dev/projects/openrouter-mcp/src/index.ts) to guarantee thread resilience. Integration tests verified full functionality.
 
 ### 2. Documented `verify_setup` in the User Manual
 Added **Section 12.3 Setup Verification Diagnostics** and updated Cheat Sheet **Section 14.1** of [USER_MANUAL.md](file:///home/tim/dev/projects/openrouter-mcp/USER_MANUAL.md) to provide comprehensive instruction and example output for using this new diagnostics suite.
+
+### 3. Symbolic Path Environment Variable Resolution
+Extended home tilde expansion (`~` / `~/`) in [path-utils.ts](file:///home/tim/dev/projects/openrouter-mcp/src/helpers/path-utils.ts) to support dynamic environment variable expansion (`$VAR` and `%VAR%`), fully resolving cross-platform and environment symbolic path configurations. Dedicated integration tests verify expansion correctness.
+
+### 4. Cleared Remaining Placeholders
+Resolved the final lingering `[TBD]` Git repository clone placeholder in [TESTING_GUIDE.md](file:///home/tim/dev/projects/openrouter-mcp/tests/TESTING_GUIDE.md), synchronizing public repository details across all documentation assets.

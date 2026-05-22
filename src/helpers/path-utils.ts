@@ -12,19 +12,29 @@ const RESTRICTED_PATHS = [
 ];
 
 /**
- * Expands symbolic home directories (e.g., ~/ or ~) to absolute paths.
+ * Expands symbolic home directories (e.g., ~/ or ~) and environment variables (e.g., $HOME, %USERPROFILE%) to absolute paths.
  */
 export function resolveHomePath(targetPath: string): string {
-  if (targetPath === "~") {
-    return os.homedir();
+  let resolved = targetPath;
+
+  // 1. Expand ~ and ~/ prefixes
+  if (resolved === "~") {
+    resolved = os.homedir();
+  } else if (resolved.startsWith("~" + path.sep) || resolved.startsWith("~/")) {
+    resolved = path.join(os.homedir(), resolved.slice(2));
   }
-  if (targetPath.startsWith("~" + path.sep)) {
-    return path.join(os.homedir(), targetPath.slice(2));
-  }
-  if (targetPath.startsWith("~/")) {
-    return path.join(os.homedir(), targetPath.slice(2));
-  }
-  return targetPath;
+
+  // 2. Expand Unix environment variables ($VAR)
+  resolved = resolved.replace(/\$([a-zA-Z_][a-zA-Z0-9_]*)/g, (_, name) => {
+    return process.env[name] || "";
+  });
+
+  // 3. Expand Windows environment variables (%VAR%)
+  resolved = resolved.replace(/%([^%]+)%/g, (_, name) => {
+    return process.env[name] || "";
+  });
+
+  return resolved;
 }
 
 /**

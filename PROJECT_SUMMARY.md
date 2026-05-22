@@ -6,7 +6,7 @@
 
 ## What This Is
 
-A production-ready MCP server that wraps the OpenRouter LLM API with 22 tools across eight capability categories. Built to serve as the backbone for Antigravity, an AI coding agent doing advanced multi-repo development.
+A production-ready MCP server that wraps the OpenRouter LLM API with 24 tools across nine capability categories. Built to serve as the backbone for Antigravity, an AI coding agent doing advanced multi-repo development.
 
 Now fully modularized, performance-optimized, and security-hardened.
 
@@ -25,7 +25,7 @@ A lightweight orchestrator that:
 
 ### 2. Domain Tool Modules (`src/tools/`)
 Tools are grouped into specialized modules:
-- `chat.ts`: Chat completions, presets, recommendations.
+- `chat.ts`: Chat completions, presets, recommendations, ensemble parallel voting consensus, and intelligent routing.
 - `models.ts`: Catalog listing, fuzzy filtering (`filter_models`), and session usage metrics.
 - `account.ts`: Balance and key information.
 - `vision.ts`: Image analysis.
@@ -38,9 +38,11 @@ Tools are grouped into specialized modules:
 ### 3. Shared Helpers (`src/helpers/`)
 Centralized logic used across modules:
 - `rate-guard.ts`: Budget enforcement, circuit breakers, and token buckets.
+- `router.ts`: Intelligent token estimation, dynamic model slicing context filters, quality/cost sorting, and local overrides.
 - `pricing.ts`: Cost tracking and model pricing cache.
 - `embeddings.ts`: Vector generation and similarity logic.
 - `context-store.ts`: JSON-based vector persistence.
+- `watcher.ts`: Debounced filesystem watchers and line-shift resilient MD5 reuse guards.
 - `config-loader.ts`: `tools.config.json` and profile loading.
 
 ---
@@ -67,8 +69,10 @@ Profiles (found in `profiles/*.json`) allow for environment-specific toolsets.
 | Apr 27, 2026 | Phase 4 | **Modular Refactor**: Extract tools/helpers + Config-driven toggling |
 | Apr 27, 2026 | Phase 5 | **Testing & Verification**: 33 automated tests + Path security sanitization |
 | May 21, 2026 | Phase 6 | **Performance & Safety**: local cache (`pricing_cache.json`), Key firewall, `filter_models`, `verify_setup` |
+| May 21, 2026 | Phase 7 | **Resilience, Consensus & Routing**: dynamic retry-on-failover, ensemble consensus reviews, FS real-time incremental watch indexing, and intelligent model-task routing |
+| May 22, 2026 | Phase 8 | **Transitive Lockfile Auditing**: Deep lockfile-based transitive dependency analysis, conflict auditing, and targeted resolution paths |
 
 ---
 
-*Built and Verified by Antigravity · May 21, 2026*
+*Built and Verified by Antigravity · May 22, 2026*
 

@@ -47,6 +47,8 @@ Files containing model references:
 | 6 | **Add "Hello World" verification step** | Documentation | ✅ Done (May 2026) | Implemented the custom server diagnostics tool (`verify_setup`). |
 | 7 | **Screenshots for setup instructions** | Documentation | Low | Peer review recommended platform-specific screenshots for Node.js and environment variable setup. |
 | 8 | **Companion troubleshooting guide** | Documentation | Low | Peer review suggested a standalone troubleshooting document beyond Chapter 12. |
+| 9 | **Scalable Semantic Storage (Option F)** | Performance | 🟡 Recommended | Outlined a modular VectorStore provider architecture to support local SQLite tables or pgvector / ChromaDB databases once chunks > 10,000. See the detailed design in the [scalable-semantic-storage.md](file:///home/tim/dev/projects/openrouter-mcp/blueprints/scalable-semantic-storage.md) blueprint. |
+| 10 | **Headless CI/CD PR Review (Option G)** | Code Quality | Low | Introduces structured JSON reviews (`{ approve: boolean, issues[] }`) to audit Git diffs automatically in silent CI/CD pipelines. |
 
 ---
 

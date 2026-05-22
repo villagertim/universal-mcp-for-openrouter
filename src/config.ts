@@ -42,7 +42,7 @@ export const CONFIG_FILE_PATH = path.join(DATA_DIR, "tools.config.json");
 
 // Code Search Constants
 export const CODE_TAG                = "__code__";
-export const CODE_EMBEDDING_MODEL    = "openai/text-embedding-3-large";
+export const CODE_EMBEDDING_MODEL    = "openai/text-embedding-3-small";
 export const CODE_CHUNK_LINES        = 50;
 export const CODE_CHUNK_STRIDE       = 40;
 export const CODE_MAX_FILE_BYTES     = 50_000;

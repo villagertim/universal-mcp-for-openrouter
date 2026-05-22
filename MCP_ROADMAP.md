@@ -41,6 +41,18 @@ Every `/chat/completions` call passes three pre-flight checks before the request
 - **Fuzzy Model Filtering**: Added `filter_models` tool for fast local-side catalog search, context sizing, maximum prompt price caps, and vision-capability checks.
 - **Diagnostics Setup**: Added `verify_setup` tool for instant validation of runtime conditions, folder permissions, and Node compatibility.
 
+### Phase 6 — Resilience, Consensus & Routing ✅
+**Robust Remote Failovers and Multi-Model Accord**
+- **Dynamic Failover Routing**: Intercepts model completion calls, automatically failing over to comparable backup models (from the pricing cache or static maps) in the event of upstream API downtime, matching vision/context capabilities.
+- **Parallel Multi-Model Consensus**: Added `chat_ensemble` tool to execute parallel queries across different reasoning engines, using a synthesizer model to critique and output a unified optimal path.
+- **Real-Time Filesystem Watching**: Integrated an asynchronous native `fs.watch` loop that automatically and incrementally updates AST symbol indices and recalculates vector embeddings upon file edits/deletions.
+- **Intelligent Model-Task Routing**: Exposed `chat_routed` to dynamically classify prompts and run them on the cheapest available model matching the target quality threshold.
+
+### Phase 7 — Transitive Lockfile Auditing ✅
+**Targeted Deep Dependency Trees**
+- **Lockfile-Based Sweep**: Direct, fast offline parsing of `package-lock.json` and `Cargo.lock` files to sweep thousands of transitive dependencies in sub-milliseconds without triggering heavy sub-processes.
+- **Path Tracing & Semver Audits**: Exposes focus-path tracing back to zero-in-degree roots and detects duplicate nested packages with semver conflicts.
+
 ---
 
 ## What Was Cut and Why
@@ -52,7 +64,6 @@ Every `/chat/completions` call passes three pre-flight checks before the request
 | `checkpoint_context` | Duplicate of Antigravity's KI system + existing `pin_context` |
 | `task_plan` | Antigravity natively plans and persists artifacts; no capability delta |
 | `diff_review` | Antigravity IS the review model; only useful in headless pipelines |
-| `multi_model_consensus` | Medium value for current human-in-loop workflow; deferred |
 | `webhook_listen` | Narrow use case; high infrastructure complexity; deferred |
 
 ---
@@ -64,22 +75,20 @@ Every `/chat/completions` call passes three pre-flight checks before the request
 | Cost / budget overruns | ✅ Addressed | `rate_limiter` budget cap + enforcement |
 | Runaway API request loops | ✅ Addressed | Circuit breaker + token bucket |
 | Dangerous command execution | ✅ (native) | Antigravity's user-approval gate |
-| Autonomous code quality review | ⚠️ Agent judgment | No formal gate; acceptable for human-in-loop |
-| Cross-model decision confidence | ❌ Deferred | `multi_model_consensus` not built |
+| Autonomous code quality review | ⚠️ Agent judgment | No formal gate; acceptable for human-loop |
+| Cross-model decision confidence | ✅ Addressed | `chat_ensemble` parallel consensus reviews |
 
 ---
 
-## Possible Next Steps (v2)
+## Future Roadmap (v3) — Outstanding Enhancements
 
-| Idea | What it unlocks |
-|:---|:---|
-| `dependency_graph` v2 — transitive deps | Shell out to `npm ls --json` / `cargo tree` for full tree |
-| `semantic_code_search` at scale | Migrate `context_store.json` to pgvector or ChromaDB when chunk count > 10k |
-| Auto-watch + incremental reindex | `chokidar` file watcher triggers `reindex_project` on save |
-| `multi_model_consensus` | Parallel model calls + judge synthesis for high-stakes decisions |
-| `diff_review` | Structured `{ approve: boolean, issues[] }` gate for headless pipelines |
+| Idea | What it unlocks | Priority | Notes |
+|:---|:---|:---:|:---|
+| **Scalable Semantic Storage (Option F)** | Migrate `context_store.json` to SQLite or pgvector / ChromaDB when chunk counts exceed 10,000. | 🟡 Medium | Retained as technical debt / future enhancement to optimize startup memory and I/O locking at scale. See [scalable-semantic-storage.md](file:///home/tim/dev/projects/openrouter-mcp/blueprints/scalable-semantic-storage.md) for the design layout. |
+| **Headless CI/CD diff_review (Option G)** | Structured `{ approve: boolean, issues[] }` review gate for automated pull request pipelines. | ⚪ Low | Only useful for headless CI/CD systems where interactive agents are not active. |
 
 ---
 
-*Built by Antigravity · April 27, 2026*
+*Built by Antigravity · May 22, 2026*
+
 
