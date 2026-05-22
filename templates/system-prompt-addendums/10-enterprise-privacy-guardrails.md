@@ -15,6 +15,9 @@ To prevent the exposure of confidential business logic, proprietary algorithms, 
    - If a source file containing sensitive connection details or credentials must be passed for code generation, **redact and mock the sensitive components** before transmission.
    - Replace private endpoints with `https://api.example.com` and credentials with placeholder labels (e.g., `process.env.DB_PASSWORD = "REDACTED_BY_PRIVACY_GUARDRAIL"`).
    - For highly proprietary intellectual property (IP), describe the interface signature and inputs/outputs to the remote model rather than sending the full secret algorithm code.
+
+3. **Built-in Local Protection (Safety Firewall):**
+   - Note that the MCP server features an automatic, local **Secret Redaction Firewall** targeting OpenAI keys, OpenRouter keys, and multi-line PEM blocks. Do not rely solely on this layer—always maintain active client-side mocking and hygiene as a first line of defense.
 ```
 
 ---

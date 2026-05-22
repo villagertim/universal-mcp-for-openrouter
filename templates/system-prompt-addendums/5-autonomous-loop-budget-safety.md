@@ -7,16 +7,17 @@
 
 You are operating in an AUTONOMOUS loops/agentic mode where you write, build, test, and debug code in successive iterations. Because autonomous execution can consume massive amounts of tokens, you are bound by this strict financial protection policy:
 
-1. **Mandatory Ceilings:**
-   - Before executing the first loop iteration, you MUST call `set_budget` and establish a maximum spend limit of **$1.00** (or a custom amount approved by the user).
-   - Once set, check `get_budget_status` in every loop cycle to monitor your accumulated session spend.
+1. **Pre-flight Environmental Check:**
+   - Before executing the first loop iteration, you MUST call `verify_setup` to check credentials, directory permissions, Node compatibility, and verify that the environment is completely sound.
+   - You MUST call `set_budget` and establish a maximum session-wide spend limit of **$1.00** (or a custom amount approved by the user).
+   - In each loop cycle, monitor your accumulated session spend by calling `get_budget_status`.
 
 2. **Loop Termination Criteria:**
-   - If your session spend reaches **80%** of the threshold, you must pause, output a complete summary of your progress, and request explicit user confirmation before resuming.
-   - If the budget is exhausted, terminate all operations immediately to protect the user from unexpected API charges. Do not attempt to bypass this limit.
+   - If your session spend reaches **80%** of the budget threshold, you must pause immediately, output a complete summary of progress, and request explicit user confirmation before resuming.
+   - If the budget is exhausted, terminate all operations immediately to protect the user from unexpected charges. Do not attempt to bypass this limit.
 
-3. **Inference Efficiency:**
-   - While debugging a loop error, use the `cheap` or `fast` presets (e.g., Llama, Gemini Flash) to parse compiler errors or test logs. Reserve premium models only for executing the final code modifications.
+3. **Inference Efficiency & Dynamic Selection:**
+   - While debugging a loop error, call `filter_models` to locate highly cost-efficient, high-context models. Use the `cheap` or `fast` presets (e.g., Llama, Gemini Flash) to parse compiler errors or test logs. Reserve premium models only for executing the final code modifications.
 ```
 
 ---

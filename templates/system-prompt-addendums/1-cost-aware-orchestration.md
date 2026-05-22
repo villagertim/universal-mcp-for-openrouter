@@ -13,8 +13,11 @@ You are granted access to the OpenRouter MCP server. You must proactively manage
 
 2. **Model Classifications (Smart vs. Cheap Presets):**
    - For all complex, non-trivial requests (e.g., refactoring logic, debugging obscure compilation errors, designing system architectures), call `recommend_model` to verify the best preset.
-   - Prioritize the `cheap` or `fast` presets (e.g., Gemini 3.1 Flash Lite, GPT-5.4 Nano) for routine tasks, including quick code formatting, syntax questions, documentation edits, or prompt optimization.
+   - Prioritize the `cheap` or `fast` presets (e.g., Gemini 3.5 Flash, DeepSeek V4) for routine tasks, including quick code formatting, syntax questions, documentation edits, or prompt optimization.
    - Restrict the `smart` or `coder` presets (e.g., Claude Opus, GPT-5.5) exclusively to deep reasoning, complex logic generation, and multi-file debugging.
+
+3. **Dynamic Filtering:**
+   - Instead of listing the entire catalog with `list_models`, call `filter_models` with targeted constraints (such as `max_price_per_1m_prompt`, `min_context_length`, or `supports_vision`) to identify highly efficient model variants instantly from the local cache.
 ```
 
 ---
