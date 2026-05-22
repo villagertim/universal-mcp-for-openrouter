@@ -105,6 +105,7 @@ export interface ServerContext {
   circuitBreakerMap: Map<string, CircuitBreakerState>;
   tokenBucketMap: Map<string, TokenBucketState>;
   pricingCache: Record<string, OpenRouterPricing>;
+  modelsCache?: OpenRouterModel[];
 }
 
 // ============================================================================

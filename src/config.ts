@@ -32,6 +32,7 @@ export const DEFAULT_RATE_CONFIG: RateLimiterConfig = {
 export const RATE_CONFIG_PATH = path.join(DATA_DIR, "rate_config.json");
 export const SYMBOL_INDEX_PATH = path.join(DATA_DIR, "symbol_index.json");
 export const CONTEXT_STORE_PATH = path.join(DATA_DIR, "context_store.json");
+export const PRICING_CACHE_PATH = path.join(DATA_DIR, "pricing_cache.json");
 export const PROFILES_DIR = path.join(DATA_DIR, "profiles");
 export const CONFIG_FILE_PATH = path.join(DATA_DIR, "tools.config.json");
 

@@ -16,7 +16,7 @@ import path from "path";
 // Shared Infrastructure
 import { ServerContext } from "./types.js";
 import { DEFAULT_RATE_CONFIG, OPENROUTER_BASE_URL, USER_ENV_PATH, ROOT_DIR } from "./config.js";
-import { refreshPricingCache } from "./helpers/pricing.js";
+import { refreshPricingCache, loadPricingCacheFromDisk } from "./helpers/pricing.js";
 import { loadRateConfig } from "./helpers/config-store.js";
 import { loadToolConfig, ToolConfig } from "./helpers/config-loader.js";
 
@@ -95,13 +95,18 @@ class OpenRouterServer {
       this.ctx.rateLimiterConfig = await loadRateConfig();
     } catch {}
 
-    // 2. Load tool configuration (profile)
+    // 2. Load pricing cache from disk
+    try {
+      await loadPricingCacheFromDisk(this.ctx);
+    } catch {}
+
+    // 3. Load tool configuration (profile)
     const { config, profileName } = await loadToolConfig();
     
-    // 3. Setup handlers
+    // 4. Setup handlers
     this.setupHandlers(config, profileName);
 
-    // 4. Background tasks
+    // 5. Background tasks
     refreshPricingCache(this.ctx);
   }
 

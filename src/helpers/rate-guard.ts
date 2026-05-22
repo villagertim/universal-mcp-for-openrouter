@@ -70,6 +70,33 @@ export function recordFailure(ctx: ServerContext, model: string): void {
   }
 }
 
+export function redactSecrets(obj: any): any {
+  if (obj === null || obj === undefined) return obj;
+  if (typeof obj === "string") {
+    let redacted = obj;
+    // Regex for OpenRouter Key
+    redacted = redacted.replace(/sk-or-v1-[a-zA-Z0-9]{32,128}/gi, "[REDACTED]");
+    // Regex for OpenAI API Key
+    redacted = redacted.replace(/sk-proj-[a-zA-Z0-9_-]{32,128}/gi, "[REDACTED]");
+    // Regex for SSH / Private key blocks
+    redacted = redacted.replace(/-----BEGIN\s+[A-Z0-9\s_-]+KEY-----[\s\S]+?-----END\s+[A-Z0-9\s_-]+KEY-----/gi, "[REDACTED]");
+    return redacted;
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(item => redactSecrets(item));
+  }
+  if (typeof obj === "object") {
+    const copy: any = {};
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        copy[key] = redactSecrets(obj[key]);
+      }
+    }
+    return copy;
+  }
+  return obj;
+}
+
 export async function guardedCompletionPost(ctx: ServerContext, model: string, data: any): Promise<any> {
   const budget = checkBudget(ctx);
   if (!budget.allowed) throw new Error(budget.message);
@@ -80,8 +107,10 @@ export async function guardedCompletionPost(ctx: ServerContext, model: string, d
   const tb = checkTokenBucket(ctx, model);
   if (!tb.allowed) throw new Error(tb.message);
 
+  const finalData = process.env.DISABLE_REDACTION === "true" ? data : redactSecrets(data);
+
   try {
-    const response = await ctx.axiosInstance.post("/chat/completions", data);
+    const response = await ctx.axiosInstance.post("/chat/completions", finalData);
     recordSuccess(ctx, model);
     return response;
   } catch (error) {
@@ -97,5 +126,7 @@ export async function guardedEmbeddingPost(ctx: ServerContext, model: string, da
   const tb = checkTokenBucket(ctx, model);
   if (!tb.allowed) throw new Error(tb.message);
 
-  return await ctx.axiosInstance.post("/embeddings", data);
+  const finalData = process.env.DISABLE_REDACTION === "true" ? data : redactSecrets(data);
+
+  return await ctx.axiosInstance.post("/embeddings", finalData);
 }
