@@ -160,6 +160,8 @@ To help your agentic coding assistants (like Claude Code, OpenClaw, or Hermes) m
 12. **[Context Window Garbage Collection](file:///home/tim/dev/projects/openrouter-mcp/templates/system-prompt-addendums/12-context-garbage-collection.md):** Minimizes token pricing and eliminates hallucinations by periodically purging active context bloat.
 13. **[OpenClaw CLI Loop-Stall & Log Pruning](file:///home/tim/dev/projects/openrouter-mcp/templates/system-prompt-addendums/13-openclaw-cli-loop-pruning.md):** Formulates terminal hygiene policies to prevent compilation locks and strip noise from test results.
 14. **[Structured Planning & JSON Chaining](file:///home/tim/dev/projects/openrouter-mcp/templates/system-prompt-addendums/14-hermes-structured-tool-chaining.md):** Instructs Hermes-type JSON function call engines to compress reasoning steps and accelerate tool parallel execution.
+15. **[Diagnostic Self-Healing & Pre-Flight Integration](file:///home/tim/dev/projects/openrouter-mcp/templates/system-prompt-addendums/15-diagnostic-self-healing.md):** Mandates early setup diagnostic checks and reactive troubleshooting to handle budget or runtime failures gracefully.
+16. **[High-Context Codebase Navigation & Model Slicing](file:///home/tim/dev/projects/openrouter-mcp/templates/system-prompt-addendums/16-high-context-catalog-slicing.md):** Dynamically estimates file token sizes to query and select the most budget-efficient high-context models.
 
 Copy and paste these templates directly into your bot's system instructions or configuration environment to get started.
 
