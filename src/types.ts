@@ -230,3 +230,12 @@ export interface SetBudgetArgs {
   max_dollars?: number;
   warn_at_percent?: number;
 }
+
+export interface ChatEnsembleArgs {
+  models: string[];
+  prompt: string;
+  system_prompt?: string;
+  synthesizer_model?: string;
+  temperature?: number;
+  max_tokens?: number;
+}

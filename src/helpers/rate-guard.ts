@@ -181,6 +181,56 @@ export function getDynamicBackups(ctx: ServerContext, primaryModel: string, need
   return fallbacks.slice(0, 3);
 }
 
+export function checkPessimisticBudget(
+  ctx: ServerContext,
+  models: string[],
+  maxTokens?: number
+): { allowed: boolean; message?: string } {
+  const spent = ctx.sessionUsage.cost;
+  const max = ctx.rateLimiterConfig.max_dollars;
+  if (spent >= max) {
+    return {
+      allowed: false,
+      message: `💰 Budget cap reached: $${spent.toFixed(4)} of $${max.toFixed(2)} spent this session.`,
+    };
+  }
+
+  let reservation = 0.0;
+  const defaultTokens = maxTokens ?? 1000;
+
+  for (const model of models) {
+    let promptPrice = 0.0;
+    let completionPrice = 0.0;
+
+    if (ctx.modelsCache) {
+      const cached = ctx.modelsCache.find(m => m.id === model);
+      if (cached) {
+        promptPrice = parseFloat(cached.pricing.prompt || "0");
+        completionPrice = parseFloat(cached.pricing.completion || "0");
+      }
+    } else if (ctx.pricingCache && ctx.pricingCache[model]) {
+      const cached = ctx.pricingCache[model];
+      promptPrice = parseFloat(cached.prompt || "0");
+      completionPrice = parseFloat(cached.completion || "0");
+    }
+
+    if (promptPrice === 0) promptPrice = 0.00001; // Conservative defaults if unrecognized
+    if (completionPrice === 0) completionPrice = 0.00003;
+
+    const modelCost = (promptPrice * defaultTokens) + (completionPrice * defaultTokens);
+    reservation += modelCost;
+  }
+
+  if (spent + reservation > max) {
+    return {
+      allowed: false,
+      message: `🚦 Pre-flight Budget Reservation Rejected: Worst-case concurrent cost ($${reservation.toFixed(4)}) plus current spent ($${spent.toFixed(4)}) would breach the budget cap ($${max.toFixed(2)}). Use set_budget to raise the limit.`,
+    };
+  }
+
+  return { allowed: true };
+}
+
 export async function guardedCompletionPost(ctx: ServerContext, model: string, data: any): Promise<any> {
   const budget = checkBudget(ctx);
   if (!budget.allowed) throw new Error(budget.message);

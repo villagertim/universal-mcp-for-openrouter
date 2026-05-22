@@ -30,6 +30,8 @@ export const DEFAULT_RATE_CONFIG: RateLimiterConfig = {
   fallback_price_multiplier: 1.5,
 };
 
+export const DEFAULT_SYNTHESIZER_MODEL = "google/gemini-1.5-pro";
+
 // State Paths
 export const RATE_CONFIG_PATH = path.join(DATA_DIR, "rate_config.json");
 export const SYMBOL_INDEX_PATH = path.join(DATA_DIR, "symbol_index.json");
