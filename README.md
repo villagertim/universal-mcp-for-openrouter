@@ -143,6 +143,10 @@ To help your agentic coding assistants (like Claude Code, OpenClaw, or Hermes) m
 3. **[Prompt Optimization & Fallback Routing](file:///home/tim/dev/projects/openrouter-mcp/templates/system-prompt-addendums/3-resilient-refactoring-optimization.md):** Keeps major refactoring tasks cost-efficient and outage-resistant.
 4. **[Multi-Service Log Correlation](file:///home/tim/dev/projects/openrouter-mcp/templates/system-prompt-addendums/4-distributed-diagnostics.md):** Instructs the agent to isolate log ingestion to debug system failures quietly.
 5. **[Autonomous Loop Safety Policy](file:///home/tim/dev/projects/openrouter-mcp/templates/system-prompt-addendums/5-autonomous-loop-budget-safety.md):** A strict financial circuit breaker for autonomous background execution loops.
+6. **[Workspace Memory & Long-Term Pinning](file:///home/tim/dev/projects/openrouter-mcp/templates/system-prompt-addendums/6-workspace-memory-pinning.md):** Solves conversation amnesia by persistently caching architectural and domain constraints.
+7. **[High-Throughput Batch Operations](file:///home/tim/dev/projects/openrouter-mcp/templates/system-prompt-addendums/7-high-throughput-batch-operations.md):** Orchestrates multi-file conversions and template updates with cost-effective models.
+8. **[CI/CD & Build Pipeline Diagnostics](file:///home/tim/dev/projects/openrouter-mcp/templates/system-prompt-addendums/8-pipeline-diagnostics.md):** Automates container crash diagnostics and patch validation to resolve build failures.
+9. **[Monorepo Dependency & Semver Syncing](file:///home/tim/dev/projects/openrouter-mcp/templates/system-prompt-addendums/9-monorepo-dependency-sync.md):** Performs pre-commit audits to keep package dependencies fully aligned across microservices.
 
 Copy and paste these templates directly into your bot's system instructions or configuration environment to get started.
 
