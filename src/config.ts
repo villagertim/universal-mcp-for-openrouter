@@ -26,6 +26,8 @@ export const DEFAULT_RATE_CONFIG: RateLimiterConfig = {
   max_dollars: 10.00,
   warn_at_percent: 80,
   max_requests_per_minute: 20,
+  disable_failover: false,
+  fallback_price_multiplier: 1.5,
 };
 
 // State Paths

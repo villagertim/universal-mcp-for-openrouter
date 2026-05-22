@@ -97,26 +97,165 @@ export function redactSecrets(obj: any): any {
   return obj;
 }
 
+export function getDynamicBackups(ctx: ServerContext, primaryModel: string, needsVision?: boolean): string[] {
+  const fallbacks: string[] = [];
+  const isCandidate = (m: string) => m !== primaryModel;
+  const multiplier = ctx.rateLimiterConfig.fallback_price_multiplier ?? 1.5;
+
+  // 1. Try resolving using models cache
+  if (ctx.modelsCache && ctx.modelsCache.length > 0) {
+    const primary = ctx.modelsCache.find(m => m.id === primaryModel);
+    if (primary) {
+      const primaryPromptPrice = parseFloat(primary.pricing.prompt || "0");
+      const primaryContext = primary.context_length || 4096;
+
+      const candidates = ctx.modelsCache.filter(m => {
+        if (m.id === primaryModel) return false;
+        if (m.context_length < primaryContext) return false;
+
+        if (needsVision) {
+          const hasVision = (m.pricing.image && parseFloat(m.pricing.image) > 0) || 
+                            m.name.toLowerCase().includes("vision") || 
+                            m.id.toLowerCase().includes("vision");
+          if (!hasVision) return false;
+        }
+
+        const price = parseFloat(m.pricing.prompt || "0");
+        if (price > primaryPromptPrice * multiplier) return false;
+
+        return true;
+      });
+
+      // Sort by price (cheapest first), then context length (largest first)
+      candidates.sort((a, b) => {
+        const priceA = parseFloat(a.pricing.prompt || "0");
+        const priceB = parseFloat(b.pricing.prompt || "0");
+        if (priceA !== priceB) return priceA - priceB;
+        return b.context_length - a.context_length;
+      });
+
+      for (const cand of candidates) {
+        if (isCandidate(cand.id)) {
+          fallbacks.push(cand.id);
+        }
+      }
+    }
+  }
+
+  // 2. Fallback to high-quality static tiers if unpopulated or unrecognized
+  if (fallbacks.length === 0) {
+    const modelLower = primaryModel.toLowerCase();
+    const isPremium = modelLower.includes("opus") ||
+                      modelLower.includes("sonnet-4") ||
+                      modelLower.includes("claude-3-5-sonnet") ||
+                      modelLower.includes("gpt-4") ||
+                      modelLower.includes("gpt-5") ||
+                      modelLower.includes("gemini-1.5-pro") ||
+                      modelLower.includes("gemini-3.1-pro") ||
+                      modelLower.includes("grok-4");
+
+    if (isPremium) {
+      const premiumStatic = [
+        "anthropic/claude-3.5-sonnet",
+        "google/gemini-1.5-pro",
+        "openai/gpt-4o",
+        "anthropic/claude-3-5-haiku"
+      ];
+      for (const m of premiumStatic) {
+        if (isCandidate(m)) fallbacks.push(m);
+      }
+    } else {
+      const cheapStatic = [
+        "google/gemini-1.5-flash",
+        "openai/gpt-4o-mini",
+        "anthropic/claude-3-5-haiku",
+        "meta-llama/llama-3.1-8b-instruct",
+        "qwen/qwen-2.5-72b-instruct"
+      ];
+      for (const m of cheapStatic) {
+        if (isCandidate(m)) fallbacks.push(m);
+      }
+    }
+  }
+
+  return fallbacks.slice(0, 3);
+}
+
 export async function guardedCompletionPost(ctx: ServerContext, model: string, data: any): Promise<any> {
   const budget = checkBudget(ctx);
   if (!budget.allowed) throw new Error(budget.message);
 
-  const cb = checkCircuitBreaker(ctx, model);
-  if (!cb.allowed) throw new Error(cb.message);
+  const disableFailover = process.env.DISABLE_FAILOVER === "true" || ctx.rateLimiterConfig.disable_failover === true;
 
-  const tb = checkTokenBucket(ctx, model);
-  if (!tb.allowed) throw new Error(tb.message);
-
-  const finalData = process.env.DISABLE_REDACTION === "true" ? data : redactSecrets(data);
-
-  try {
-    const response = await ctx.axiosInstance.post("/chat/completions", finalData);
-    recordSuccess(ctx, model);
-    return response;
-  } catch (error) {
-    recordFailure(ctx, model);
-    throw error;
+  // Resolve failover attempts sequence
+  let attempts: string[] = [model];
+  if (!disableFailover) {
+    let fallbacks: string[] = [];
+    if (data.models && Array.isArray(data.models)) {
+      fallbacks = data.models.filter((m: any) => typeof m === "string");
+    } else {
+      const needsVision = data.messages && JSON.stringify(data.messages).includes("image_url");
+      fallbacks = getDynamicBackups(ctx, model, needsVision);
+    }
+    
+    // De-duplicate, preserve order, and exclude primary model from fallback slots to prevent cycle loops
+    const uniqueFallbacks = Array.from(new Set(fallbacks)).filter(m => m !== model);
+    attempts = [model, ...uniqueFallbacks];
   }
+
+  const errors: Array<{ model: string; error: string }> = [];
+
+  for (let i = 0; i < attempts.length; i++) {
+    const currentModel = attempts[i];
+    const isPrimary = i === 0;
+
+    if (!isPrimary) {
+      console.error(`[Failover] 🔄 Primary model "${model}" failed. Attempting fallback: "${currentModel}"...`);
+    }
+
+    // Check circuit breaker locally
+    const cb = checkCircuitBreaker(ctx, currentModel);
+    if (!cb.allowed) {
+      errors.push({ model: currentModel, error: cb.message || "Circuit breaker open" });
+      console.error(`[Failover] Skipping model "${currentModel}": Circuit breaker is open.`);
+      continue;
+    }
+
+    // Check token bucket rate limit locally
+    const tb = checkTokenBucket(ctx, currentModel);
+    if (!tb.allowed) {
+      errors.push({ model: currentModel, error: tb.message || "Rate limit reached" });
+      console.error(`[Failover] Skipping model "${currentModel}": Token bucket rate limit hit.`);
+      continue;
+    }
+
+    // Reconstruct data payload for this specific model attempt
+    const attemptData = { ...data };
+    attemptData.model = currentModel;
+    if (attemptData.models) {
+      delete attemptData.models;
+    }
+
+    const finalData = process.env.DISABLE_REDACTION === "true" ? attemptData : redactSecrets(attemptData);
+
+    try {
+      const response = await ctx.axiosInstance.post("/chat/completions", finalData);
+      recordSuccess(ctx, currentModel);
+      
+      if (!isPrimary) {
+        console.error(`[Failover] ⚡ Primary model "${model}" failed. Transparently rerouted and completed via "${currentModel}".`);
+      }
+      return response;
+    } catch (error: any) {
+      recordFailure(ctx, currentModel);
+      const errMsg = error.response?.data?.error?.message || error.message;
+      errors.push({ model: currentModel, error: errMsg });
+      console.error(`[Failover] ⚠️ Model "${currentModel}" failed: ${errMsg}`);
+    }
+  }
+
+  const summary = errors.map(e => `[${e.model}]: ${e.error}`).join("; ");
+  throw new Error(`All completion attempts exhausted. Details: ${summary}`);
 }
 
 export async function guardedEmbeddingPost(ctx: ServerContext, model: string, data: any): Promise<any> {

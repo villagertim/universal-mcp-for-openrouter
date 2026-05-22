@@ -86,6 +86,8 @@ export interface RateLimiterConfig {
   max_dollars: number;
   warn_at_percent: number;
   max_requests_per_minute: number;
+  disable_failover?: boolean;
+  fallback_price_multiplier?: number;
 }
 
 export interface CircuitBreakerState {
