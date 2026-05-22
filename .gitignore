@@ -8,6 +8,7 @@ venv/
 context_store.json
 symbol_index.json
 rate_config.json
+pricing_cache.json
 
 # Built Packages
 *.tgz
