@@ -16,7 +16,8 @@ CYAN="\033[36m"
 RED="\033[31m"
 NC="\033[0m" # No Color
 
-BACKUP_FILE="openrouter-mcp-workspace.tar.gz"
+# Locate the backup file (checks for dated backups first, sorted by newest)
+BACKUP_FILE=$(ls -t openrouter-mcp-workspace-*.tar.gz 2>/dev/null | head -n 1 || echo "openrouter-mcp-workspace.tar.gz")
 
 echo -e "${BOLD}${CYAN}====================================================${NC}"
 echo -e "${BOLD}${CYAN}🚀 Universal MCP for OpenRouter — Workspace Restore${NC}"
@@ -24,12 +25,13 @@ echo -e "${BOLD}${CYAN}====================================================${NC}
 
 # Check for the backup file
 if [ ! -f "$BACKUP_FILE" ]; then
-    echo -e "${RED}❌ Error: Backup archive '$BACKUP_FILE' not found in current directory.${NC}"
-    echo -e "Please ensure you copy both this restore script and the tarball into the same target directory."
+    echo -e "${RED}❌ Error: No backup archive found in current directory.${NC}"
+    echo -e "   Expected a file named: ${BOLD}openrouter-mcp-workspace-*.tar.gz${NC} or ${BOLD}openrouter-mcp-workspace.tar.gz${NC}"
+    echo -e "   Please place both the restore script and the backup archive in the same target folder."
     exit 1
 fi
 
-echo -e "\n${YELLOW}📦 Extracting workspace archive...${NC}"
+echo -e "\n${YELLOW}📦 Extracting workspace archive (${BOLD}${CYAN}$BACKUP_FILE${NC}${YELLOW})...${NC}"
 tar -xzf "$BACKUP_FILE"
 echo -e "   - Extracted all project resources."
 

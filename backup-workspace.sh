@@ -17,7 +17,8 @@ CYAN="\033[36m"
 RED="\033[31m"
 NC="\033[0m" # No Color
 
-BACKUP_FILE="openrouter-mcp-workspace.tar.gz"
+DATE=$(date +%Y-%m-%d)
+BACKUP_FILE="openrouter-mcp-workspace-${DATE}.tar.gz"
 
 echo -e "${BOLD}${CYAN}====================================================${NC}"
 echo -e "${BOLD}${CYAN}📦 Universal MCP for OpenRouter — Workspace Backup${NC}"
