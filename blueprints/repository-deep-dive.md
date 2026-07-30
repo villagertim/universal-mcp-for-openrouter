@@ -104,7 +104,7 @@ The rate-guarding framework is remarkably robust. Before executing any OpenRoute
 ## 4. Security & Portability Audit
 
 ### 🔒 Security Strengths
-- **Credential Isolation:** Reads environment variables from both the project root `.env` and a centralized user developer environment file (`~/dev/.env`).
+- **Credential Isolation:** Reads environment variables from both the project root `.env` and the XDG-standard user-level path (`~/.config/openrouter-mcp/.env`), overridable via `OPENROUTER_MCP_ENV_PATH`.
 - **Path Traversal Shield:** Employs absolute path sanitization and strict rejection of sensitive/restricted paths (e.g., `.ssh`, `.aws`, `.gnupg`, `/etc/passwd`, `/etc/shadow`) inside helper validations.
 
 ### ⚠️ Portability & Migration Safety
