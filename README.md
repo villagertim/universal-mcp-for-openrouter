@@ -46,11 +46,15 @@ npm run build
 
 ### 2. Configure API Key
 
-Create `.env` in the project root, or at `~/dev/.env` (the server checks both):
+Create `.env` in the project root:
 
 ```env
 OPENROUTER_API_KEY=sk-or-...
 ```
+
+The server also checks `~/.config/openrouter-mcp/.env` as a user-level override. Set `OPENROUTER_MCP_ENV_PATH` to point to an alternative location if needed.
+
+In Docker, inject the variable directly via `-e OPENROUTER_API_KEY=...` or compose `environment:` — no `.env` file required inside the container.
 
 ### 3. Register with your MCP Client
 

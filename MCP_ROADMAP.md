@@ -1,6 +1,6 @@
 # OpenRouter MCP — Roadmap
 
-> Final state: April 27, 2026. All four phases complete.
+> Final state: July 29, 2026. All phases complete including remediation sweeps.
 
 ---
 
@@ -69,6 +69,14 @@ Every `/chat/completions` call passes three pre-flight checks before the request
 - **Intelligent File Watcher Pruning**: Expanded `CODE_SKIP_DIRS` to prune build outputs, caches, virtualenvs, and IDE folders (`coverage`, `.venv`, `target`, `.turbo`, `.cache`, `.output`, `.nuxt`, `.svelte-kit`, `.out`, `out`, `.parcel-cache`) from real-time filesystem watchers.
 - **HTTP `Retry-After` Header Parsing**: Intercepts `retry-after` and `retry-after-ms` response headers on HTTP 429 rate limit errors in `rate-guard.ts`.
 - **Adaptive Circuit Breaker Backoff**: Replaced rigid 60s lockouts with dynamic exponential backoff starting at 5s (`5s ➔ 10s ➔ 20s ➔ 40s ➔ 60s cap`), returning healthy models to service faster.
+
+### Phase 11 — Type Safety & Model ID Remediation ✅
+**Full codebase typing, strict null-checking, and live catalog alignment**
+- **Domain type safety**: Added `Tool`/`ToolModule`/`ToolHandler` interfaces, eliminated `any`-typed surfaces across domain layer and dispatcher.
+- **`noUncheckedIndexedAccess`**: Enabled strict null indexing checks, fixed ~45 "possibly undefined" access errors across 7 files (regex groups, Map lookups, array indexing, PromiseSettledResult narrowing, object property access).
+- **Model ID refresh**: Verified every runtime preset, static fallback tier, router backup model, vision default, and public example against the live OpenRouter catalog; added regression test coverage.
+- **Configurable env path**: Replaced author-specific `~/dev/.env` with XDG-standard `~/.config/openrouter-mcp/.env`, overridable via `OPENROUTER_MCP_ENV_PATH`.
+- **Retry-After unit fix**: Corrected HTTP Retry-After header parsing (RFC 7231 seconds vs milliseconds); surfaced swallowed init-load errors.
 
 ---
 

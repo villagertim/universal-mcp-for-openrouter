@@ -30,8 +30,11 @@ import { registerDomainModules } from "./domains/index.js";
 // Background Watcher Infrastructure
 import { initializeWatcher, closeAllWatchers } from "./helpers/watcher.js";
 
-// Redirect all console.log to stderr to prevent corrupting the MCP stdout stream
-console.log = (...args) => console.error(...args);
+// Redirect all console.log to stderr to prevent corrupting the MCP stdout stream.
+// In test mode (vitest) this is skipped so vitest can capture logs normally.
+if (!process.env.VITEST) {
+  console.log = (...args) => console.error(...args);
+}
 
 // Load Environment Variables
 dotenv.config({ path: path.join(ROOT_DIR, ".env") });

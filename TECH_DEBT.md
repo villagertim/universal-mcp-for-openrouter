@@ -60,7 +60,7 @@ Items that should be resolved before announcing the project publicly.
 |---|---|---|---|
 | 9 | **Fix 3 failing test mocks** | ✅ Done (Apr 2026) | Fixed mock paths in context, budget, and code_intelligence tests. |
 | 10 | **Rename `USER_MANUAL_DRAFT.md` → `USER_MANUAL.md`** | ✅ Done (Apr 2026) | Renamed to USER_MANUAL.md and stamped as Revision 0.9. |
-| 11 | **Update preset model IDs in `src/config.ts`** | ✅ Done (Apr 2026) | Replaced 2024 models with 2026 models documented in manual (Claude Opus 4.7, GPT-5.5, Gemini 3.1 Pro, etc.). |
+| 11 | **Update preset model IDs in `src/config.ts`** | ✅ Done (Jul 2026) | Refreshed all stale runtime presets, static fallback tiers, router backup IDs, and public examples against live catalog; added presets.test.ts regression coverage. |
 | 12 | **Publish to npm** | 🟡 Recommended | Needed so users can `npx` install without cloning. Decide on package name: `universal-mcp-for-openrouter` or similar. |
 
 ---
@@ -101,3 +101,15 @@ Steps to make the project discoverable after all blockers are resolved.
 - Items marked 🔴 are blockers; items marked 🟡 are recommended but not blocking.
 - Items marked ⬜ are sequentially dependent on earlier phases.
 - Once an item is resolved, move it to a "Completed" section at the bottom with the date.
+
+---
+
+## Completed Remediation (July 2026)
+
+| Item | Summary | Date |
+|---|---|---|
+| Phase 1 — Retry-After unit fix | Corrected `retry-after` (RFC 7231 seconds) vs `retry-after-ms` parsing; surfaced swallowed init-load errors; added lock-in test for token-bucket wait. | 2026-07-29 |
+| Phase 2 — Commit in-flight refactor | Tracked `AGENTS.md`, domain orchestrator, native resources/prompts, and 7 new test files. | 2026-07-29 |
+| Phase 3 — Model ID staleness sweep | Refreshed all runtime presets, synthetic defaults, static fallback tiers, vision default, and public examples against live OpenRouter catalog. Added `presets.test.ts`. | 2026-07-29 |
+| Phase 4 — Domain type safety | Added `Tool`/`ToolModule`/`ToolHandler` interfaces; enabled `noUncheckedIndexedAccess`; fixed ~45 null-access errors across 7 files. | 2026-07-29 |
+| Phase 5 — Polish | Made `USER_ENV_PATH` configurable via `OPENROUTER_MCP_ENV_PATH`; updated TECH_DEBT; guarded stdout redirect. | 2026-07-29 |

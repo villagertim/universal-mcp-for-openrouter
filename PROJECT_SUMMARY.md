@@ -78,6 +78,7 @@ Profiles (found in `profiles/*.json`) allow for environment-specific toolsets.
 | Jul 29, 2026 | Phase 9 | **MCP Modernization Rollout**: Native MCP Resources (`openrouter://`), native MCP Prompts, domain namespaces (`src/domains/`), and input prompt sanitization |
 | Jul 29, 2026 | Phase 10 | **Technical Improvements Rollout**: Expanded secret firewall (Anthropic, GitHub, AWS, GCP), Yarn & pnpm lockfile parsing, pricing cache 24h TTL policy, and `VectorStore` abstraction |
 | Jul 29, 2026 | Phase 11 | **High-Payoff Performance & Resilience**: File watcher directory pruning (`coverage`, `.venv`, `target`, etc.), HTTP `Retry-After` header parsing, and adaptive exponential circuit breaker backoff (5s ➔ 60s cap) |
+| Jul 29, 2026 | Phase 12 | **Type Safety & Model ID Remediation**: Domain type interfaces (`Tool`/`ToolModule`/`ToolHandler`), `noUncheckedIndexedAccess` enabled with ~45 fixed null-access errors, live catalog model ID refresh across all runtime defaults and public examples, Retry-After unit fix, configurable env path, and full remediation of 13 review issues |
 
 ---
 
