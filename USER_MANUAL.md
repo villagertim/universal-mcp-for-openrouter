@@ -170,7 +170,7 @@ An **API key** is a long string of characters that proves to a service that you 
 
 **Example of what an API key looks like:**
 ```
-sk-or-v1-PLACEHOLDER
+sk-or-v1-XXXXXXXXXXXX EXAMPLE PLACEHOLDER DO NOT USE
 ```
 
 Your OpenRouter API key is what allows the MCP server to make requests on your behalf. **Treat it like a password** — never share it, never put it in code you commit to a public repository.
