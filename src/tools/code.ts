@@ -103,10 +103,10 @@ export function registerCodeTools(ctx: ServerContext) {
               let match;
               while ((match = functionRegex.exec(content)) !== null) {
                 symbols.push({ 
-                  name: match[1], 
+                  name: match[1] ?? "", 
                   file: path.relative(resolvedPath, res), 
                   project: project_name, 
-                  line: content.substring(0, match.index).split("\n").length 
+                  line: content.substring(0, match.index ?? 0).split("\n").length 
                 });
               }
             }
@@ -137,7 +137,9 @@ export function registerCodeTools(ctx: ServerContext) {
       const results: SymbolEntry[] = [];
       const lowerQuery = query.toLowerCase();
       for (const prjName in index) {
-        for (const sym of index[prjName].symbols) {
+        const prjEntry = index[prjName];
+        if (!prjEntry) continue;
+        for (const sym of prjEntry.symbols) {
           if (sym.name.toLowerCase().includes(lowerQuery)) results.push(sym);
         }
       }

@@ -3,6 +3,24 @@
 import { AxiosInstance } from "axios";
 
 // ============================================================================
+// Tool & Module Type Definitions
+// ============================================================================
+
+export interface Tool {
+  name: string;
+  description: string;
+  inputSchema: Record<string, unknown>;
+}
+
+export type ToolHandler = (args: any) => Promise<{ content: Array<{ type: string; text: string }>; isError?: boolean }>;
+
+export interface ToolModule {
+  name?: string;
+  tools: Tool[];
+  handlers: Record<string, ToolHandler>;
+}
+
+// ============================================================================
 // OpenRouter API Response Types
 // ============================================================================
 

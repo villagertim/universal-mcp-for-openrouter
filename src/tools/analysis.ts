@@ -131,14 +131,14 @@ export function registerAnalysisTools(ctx: ServerContext) {
     let name, version;
     for (const line of content.split("\n")) {
       const l = line.trim();
-      if (l.startsWith("[")) { section = l.match(/^\[([^\]]+)\]/)?.[1].trim() || ""; continue; }
+      if (l.startsWith("[")) { const sectionMatch = l.match(/^\[([^\]]+)\]/); section = sectionMatch?.[1]?.trim() || ""; continue; }
       if (section === "package") {
         const nm = l.match(/^name\s*=\s*"([^"]+)"/); if (nm) name = nm[1];
         const vm = l.match(/^version\s*=\s*"([^"]+)"/); if (vm) version = vm[1];
       }
       if (section === "dependencies" || section === "dev-dependencies") {
-        const str = l.match(/^([a-zA-Z0-9_-]-*)\s*=\s*"([^"]+)"/); if (str) deps[str[1]] = str[2];
-        const tbl = l.match(/^([a-zA-Z0-9_-]-*)\s*=\s*\{[^}]*version\s*=\s*"([^"]+)"/); if (tbl) deps[tbl[1]] = tbl[2];
+        const str = l.match(/^([a-zA-Z0-9_-]-*)\s*=\s*"([^"]+)"/); if (str) deps[str[1]!] = str[2]!;
+        const tbl = l.match(/^([a-zA-Z0-9_-]-*)\s*=\s*\{[^}]*version\s*=\s*"([^"]+)"/); if (tbl) deps[tbl[1]!] = tbl[2]!;
       }
     }
     return { name, version, deps };
@@ -168,7 +168,7 @@ export function registerAnalysisTools(ctx: ServerContext) {
       for (const [pkgPath, pkgInfo] of Object.entries(lockfile.packages)) {
         if (pkgPath === "") continue; // Skip root
         const parts = pkgPath.split("node_modules/").map(p => p.replace(/\/$/, "")).filter(Boolean);
-        const name = parts[parts.length - 1];
+        const name = parts.length > 0 ? parts[parts.length - 1] : undefined;
         const version = pkgInfo.version;
         if (name && version) {
           if (!resolved.has(name)) {
@@ -215,17 +215,17 @@ export function registerAnalysisTools(ctx: ServerContext) {
       const nameMatch = block.match(/name\s*=\s*"([^"]+)"/);
       const versionMatch = block.match(/version\s*=\s*"([^"]+)"/);
       if (nameMatch && versionMatch) {
-        const name = nameMatch[1];
-        const version = versionMatch[1];
+        const name = nameMatch[1] ?? "";
+        const version = versionMatch[1] ?? "";
         const deps: string[] = [];
         const depsSection = block.match(/dependencies\s*=\s*\[([\s\S]*?)\]/);
         if (depsSection) {
-          const depLines = depsSection[1].split("\n");
+          const depLines = (depsSection[1] ?? "").split("\n");
           for (const line of depLines) {
             const m = line.match(/"([^"]+)"/);
             if (m) {
-              const depName = m[1].split(" ")[0];
-              deps.push(depName);
+              const depName = (m[1] ?? "").split(" ")[0];
+              if (depName) deps.push(depName);
             }
           }
         }
@@ -323,7 +323,12 @@ export function registerAnalysisTools(ctx: ServerContext) {
       const resolvedPackageMap = new Map<string, Array<{ repo: string; version: string; paths: string[][] }>>();
 
       for (const repoName of targets) {
-        const repoPath = symbolIndex[repoName].path;
+        const repoEntry = symbolIndex[repoName];
+        if (!repoEntry) {
+          warnings.push(`Project "${repoName}" not found in symbol index.`);
+          continue;
+        }
+        const repoPath = repoEntry.path;
         let isTransitiveResolved = false;
 
         if (transitive) {
@@ -492,8 +497,11 @@ export function registerAnalysisTools(ctx: ServerContext) {
         for (const [pkg, entries] of shared) {
           for (let i = 0; i < entries.length; i++) {
             for (let j = i + 1; j < entries.length; j++) {
-              const vA = entries[i].version;
-              const vB = entries[j].version;
+              const entryA = entries[i];
+              const entryB = entries[j];
+              if (!entryA || !entryB) continue;
+              const vA = entryA.version;
+              const vB = entryB.version;
               const rangeA = semver.validRange(vA) ? vA : semver.clean(vA) || vA;
               const rangeB = semver.validRange(vB) ? vB : semver.clean(vB) || vB;
               
@@ -506,7 +514,7 @@ export function registerAnalysisTools(ctx: ServerContext) {
               })();
 
               if (!isIntersect) {
-                conflicts.push({ pkg, a: entries[i], b: entries[j] });
+                conflicts.push({ pkg, a: entryA, b: entryB });
               }
             }
           }

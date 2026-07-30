@@ -36,7 +36,9 @@ export async function initializeWatcher(ctx: ServerContext) {
     const index: SymbolIndex = JSON.parse(await fs.readFile(SYMBOL_INDEX_PATH, "utf-8"));
     console.error("[Watcher] 🔍 Scanning registered projects for active watching...");
     for (const projectName in index) {
-      const projectPath = index[projectName].path;
+      const projectEntry = index[projectName];
+      if (!projectEntry) continue;
+      const projectPath = projectEntry.path;
       if (fsSync.existsSync(projectPath)) {
         watchProject(ctx, projectName, projectPath).catch(err => {
           console.error(`[Watcher] Failed to initiate watch on "${projectName}":`, err.message);
@@ -249,7 +251,7 @@ async function updateASTIndex(
         let match;
         while ((match = functionRegex.exec(content)) !== null) {
           newSymbols.push({
-            name: match[1],
+            name: match[1] ?? "",
             file: relativeFile,
             project: projectName,
             line: content.substring(0, match.index).split("\n").length

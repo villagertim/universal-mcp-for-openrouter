@@ -14,9 +14,12 @@ export async function loadToolConfig(): Promise<{ config: ToolConfig; profileNam
 
   // Check for --profile arg
   const profileArgIndex = process.argv.indexOf("--profile");
-  if (profileArgIndex !== -1 && process.argv[profileArgIndex + 1]) {
-    profileName = process.argv[profileArgIndex + 1];
-    configPath = path.join(PROFILES_DIR, `${profileName}.json`);
+  if (profileArgIndex !== -1) {
+    const profileValue = process.argv[profileArgIndex + 1];
+    if (profileValue) {
+      profileName = profileValue;
+      configPath = path.join(PROFILES_DIR, `${profileName}.json`);
+    }
   }
 
   try {

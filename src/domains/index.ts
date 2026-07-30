@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-import { ServerContext } from "../types.js";
+import { ServerContext, ToolModule } from "../types.js";
 
 // Tool Modules
 import { registerChatTools } from "../tools/chat.js";
@@ -16,12 +16,6 @@ import { registerVerifyTools } from "../tools/verify.js";
 // Native Primitives
 import { registerResources } from "../resources/index.js";
 import { registerPrompts } from "../prompts/index.js";
-
-export interface DomainModule {
-  name: string;
-  tools: any[];
-  handlers: Record<string, Function>;
-}
 
 export function registerDomainModules(ctx: ServerContext) {
   const domains = {
@@ -42,7 +36,7 @@ export function registerDomainModules(ctx: ServerContext) {
     ],
   };
 
-  const allToolModules = [
+  const allToolModules: ToolModule[] = [
     ...domains.gateway,
     ...domains.intelligence,
     ...domains.diagnostics,

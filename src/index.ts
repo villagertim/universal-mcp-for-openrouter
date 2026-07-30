@@ -18,7 +18,7 @@ import { fileURLToPath } from "url";
 import path from "path";
 
 // Shared Infrastructure
-import { ServerContext } from "./types.js";
+import { ServerContext, Tool, ToolHandler } from "./types.js";
 import { DEFAULT_RATE_CONFIG, OPENROUTER_BASE_URL, USER_ENV_PATH, ROOT_DIR } from "./config.js";
 import { refreshPricingCache, loadPricingCacheFromDisk } from "./helpers/pricing.js";
 import { loadRateConfig } from "./helpers/config-store.js";
@@ -126,8 +126,8 @@ class OpenRouterServer {
   private setupHandlers(config: ToolConfig, profileName: string) {
     const { allToolModules, resourceModule, promptModule } = registerDomainModules(this.ctx);
 
-    const enabledTools: any[] = [];
-    const enabledHandlers: Record<string, Function> = {};
+    const enabledTools: Tool[] = [];
+    const enabledHandlers: Record<string, ToolHandler> = {};
     const disabledToolNames: string[] = [];
 
     for (const mod of allToolModules) {
@@ -135,7 +135,8 @@ class OpenRouterServer {
         const isEnabled = config[tool.name] !== false;
         if (isEnabled) {
           enabledTools.push(tool);
-          enabledHandlers[tool.name] = (mod.handlers as any)[tool.name];
+          const handler = mod.handlers[tool.name];
+          if (handler) enabledHandlers[tool.name] = handler;
         } else {
           disabledToolNames.push(tool.name);
         }

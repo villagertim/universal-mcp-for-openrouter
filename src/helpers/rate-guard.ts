@@ -312,7 +312,7 @@ export async function guardedCompletionPost(ctx: ServerContext, model: string, d
   const errors: Array<{ model: string; error: string }> = [];
 
   for (let i = 0; i < attempts.length; i++) {
-    const currentModel = attempts[i];
+    const currentModel = attempts[i]!;
     const isPrimary = i === 0;
 
     if (!isPrimary) {

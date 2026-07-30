@@ -250,7 +250,7 @@ export function registerChatTools(ctx: ServerContext) {
       let answer = completion;
       const thinkMatch = completion.match(/<think>([\s\S]*?)<\/think>/);
       if (thinkMatch) {
-        thinking = thinkMatch[1].trim();
+        thinking = (thinkMatch[1] ?? "").trim();
         answer = completion.replace(/<think>[\s\S]*?<\/think>/, "").trim();
       }
 
@@ -462,10 +462,12 @@ export function registerChatTools(ctx: ServerContext) {
     for (let i = 0; i < results.length; i++) {
       const res = results[i];
       const modelName = models[i];
+      if (!res || !modelName) continue;
       if (res.status === "fulfilled") {
         successfulCandidates.push(res.value);
       } else {
-        const errorMsg = res.reason.message || String(res.reason);
+        const reason = res.reason as any;
+        const errorMsg = reason?.message || String(reason);
         failedCandidates.push({ model: modelName, error: errorMsg });
         console.error(`[Ensemble] ⚠️ Model candidate "${modelName}" failed: ${errorMsg}`);
       }
