@@ -6,10 +6,20 @@ import { AxiosInstance } from "axios";
 // Tool & Module Type Definitions
 // ============================================================================
 
+export interface ToolAnnotations {
+  title?: string;
+  readOnlyHint?: boolean;
+  destructiveHint?: boolean;
+  idempotentHint?: boolean;
+  openWorldHint?: boolean;
+}
+
 export interface Tool {
   name: string;
   description: string;
   inputSchema: Record<string, unknown>;
+  title?: string;
+  annotations?: ToolAnnotations;
 }
 
 export type ToolHandler = (args: any) => Promise<{ content: Array<{ type: string; text: string }>; isError?: boolean }>;
@@ -158,6 +168,14 @@ export interface ChatRoutedArgs {
 
 export interface RecommendModelArgs {
   task: string;
+}
+
+export interface FilterModelsArgs {
+  query?: string;
+  min_context_length?: number;
+  max_price_per_1m_prompt?: number;
+  supports_vision?: boolean;
+  limit?: number;
 }
 
 export interface OptimizePromptArgs {

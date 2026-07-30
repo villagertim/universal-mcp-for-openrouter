@@ -8,7 +8,9 @@ export function registerBudgetTools(ctx: ServerContext) {
   const tools = [
     {
       name: "set_budget",
+      title: "Set Budget Limit",
       description: "Set a session-wide spending limit (in USD) and warning threshold",
+      annotations: { destructiveHint: true },
       inputSchema: {
         type: "object",
         properties: {
@@ -19,7 +21,9 @@ export function registerBudgetTools(ctx: ServerContext) {
     },
     {
       name: "get_budget_status",
+      title: "Get Budget Status",
       description: "Check the current session spending and budget status",
+      annotations: { readOnlyHint: true, idempotentHint: true },
       inputSchema: { type: "object", properties: {} },
     }
   ];

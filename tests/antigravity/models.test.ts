@@ -60,6 +60,6 @@ describe("Models & Session Management (#2)", () => {
     const result = await handlers.list_models();
 
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain("Error fetching models: Connection Timeout");
+    expect(result.content[0].text).toContain("Error: Connection Timeout");
   });
 });

@@ -16,6 +16,7 @@ import { getEmbedding, cosineSimilarity } from "../helpers/embeddings.js";
 import { loadContextStore, saveContextStore } from "../helpers/context-store.js";
 import { validatePath, resolveHomePath } from "../helpers/path-utils.js";
 import { watchProject } from "../helpers/watcher.js";
+import { withErrorHandler } from "../helpers/error-handler.js";
 import fs from "fs/promises";
 import path from "path";
 import { createHash } from "crypto";
@@ -24,7 +25,9 @@ export function registerCodeTools(ctx: ServerContext) {
   const tools = [
     {
       name: "index_project",
+      title: "Index Project Symbols",
       description: "Scan a project directory to index symbols (functions, classes, variables) for cross-project awareness",
+      annotations: { destructiveHint: true },
       inputSchema: {
         type: "object",
         properties: {
@@ -36,7 +39,9 @@ export function registerCodeTools(ctx: ServerContext) {
     },
     {
       name: "search_symbols",
+      title: "Search Symbols",
       description: "Search for symbols across all indexed projects",
+      annotations: { readOnlyHint: true },
       inputSchema: {
         type: "object",
         properties: { query: { type: "string", description: "Symbol name or partial name to search for" } },
@@ -45,7 +50,9 @@ export function registerCodeTools(ctx: ServerContext) {
     },
     {
       name: "reindex_project",
+      title: "Reindex Project Embeddings",
       description: "Perform deep semantic indexing of a project (code chunking + embeddings) for code search",
+      annotations: { destructiveHint: true },
       inputSchema: {
         type: "object",
         properties: {
@@ -57,7 +64,9 @@ export function registerCodeTools(ctx: ServerContext) {
     },
     {
       name: "semantic_code_search",
+      title: "Semantic Code Search",
       description: "Search for code logic across indexed projects using natural language",
+      annotations: { readOnlyHint: true },
       inputSchema: {
         type: "object",
         properties: {
@@ -74,19 +83,18 @@ export function registerCodeTools(ctx: ServerContext) {
   return {
     tools,
     handlers: {
-      index_project: handleIndexProject,
-      search_symbols: handleSearchSymbols,
-      reindex_project: handleReindexProject,
-      semantic_code_search: handleSemanticCodeSearch,
+      index_project: withErrorHandler("index_project", handleIndexProject),
+      search_symbols: withErrorHandler("search_symbols", handleSearchSymbols),
+      reindex_project: withErrorHandler("reindex_project", handleReindexProject),
+      semantic_code_search: withErrorHandler("semantic_code_search", handleSemanticCodeSearch),
     }
   };
 
   async function handleIndexProject(args: IndexProjectArgs) {
     const { project_path, project_name } = args;
     const symbols: SymbolEntry[] = [];
-    try {
-      const resolvedPath = path.resolve(resolveHomePath(project_path));
-      validatePath(resolvedPath);
+    const resolvedPath = path.resolve(resolveHomePath(project_path));
+    validatePath(resolvedPath);
       
       const walk = async (dir: string) => {
         const files = await fs.readdir(dir, { withFileTypes: true });
@@ -125,16 +133,12 @@ export function registerCodeTools(ctx: ServerContext) {
       });
 
       return { content: [{ type: "text", text: `Indexed ${symbols.length} symbols in "${project_name}".` }] };
-    } catch (error: any) {
-      return { content: [{ type: "text", text: `Error: ${error.message}` }], isError: true };
-    }
   }
 
   async function handleSearchSymbols(args: SearchSymbolsArgs) {
     const { query } = args;
-    try {
-      const index: SymbolIndex = JSON.parse(await fs.readFile(SYMBOL_INDEX_PATH, "utf-8"));
-      const results: SymbolEntry[] = [];
+    const index: SymbolIndex = JSON.parse(await fs.readFile(SYMBOL_INDEX_PATH, "utf-8"));
+    const results: SymbolEntry[] = [];
       const lowerQuery = query.toLowerCase();
       for (const prjName in index) {
         const prjEntry = index[prjName];
@@ -152,16 +156,12 @@ export function registerCodeTools(ctx: ServerContext) {
       }).join("\n");
       
       return { content: [{ type: "text", text: `Found ${results.length} symbols:\n\n${formatted}` }] };
-    } catch (error: any) {
-      return { content: [{ type: "text", text: `Error: ${error.message}` }], isError: true };
-    }
   }
 
   async function handleReindexProject(args: ReindexProjectArgs) {
     const { project_name, max_chunks = CODE_DEFAULT_MAX_CHUNKS } = args;
-    try {
-      const index: SymbolIndex = JSON.parse(await fs.readFile(SYMBOL_INDEX_PATH, "utf-8"));
-      if (!index[project_name]) throw new Error(`Project "${project_name}" not found.`);
+    const index: SymbolIndex = JSON.parse(await fs.readFile(SYMBOL_INDEX_PATH, "utf-8"));
+    if (!index[project_name]) throw new Error(`Project "${project_name}" not found.`);
       const projectPath = index[project_name].path;
       const store = await loadContextStore();
       const previousProjectEntries = store.filter(e => e.tag === CODE_TAG && e.project === project_name);
@@ -259,15 +259,11 @@ export function registerCodeTools(ctx: ServerContext) {
       await walk(projectPath);
       await saveContextStore([...store.filter(e => !(e.tag === CODE_TAG && e.project === project_name)), ...newEntries]);
       return { content: [{ type: "text", text: `Indexed "${project_name}": ${added} new, ${unchanged} unchanged.` }] };
-    } catch (error: any) {
-      return { content: [{ type: "text", text: `Error: ${error.message}` }], isError: true };
-    }
   }
 
   async function handleSemanticCodeSearch(args: SemanticCodeSearchArgs) {
     const { query, repos, top_k = 5, file_pattern } = args;
-    try {
-      let entries = (await loadContextStore()).filter(e => e.tag === CODE_TAG);
+    let entries = (await loadContextStore()).filter(e => e.tag === CODE_TAG);
       if (repos) entries = entries.filter(e => repos.includes(e.project ?? ""));
       if (file_pattern) entries = entries.filter(e => e.file?.toLowerCase().includes(file_pattern.toLowerCase()));
       if (entries.length === 0) return { content: [{ type: "text", text: "No matches." }] };
@@ -282,8 +278,5 @@ export function registerCodeTools(ctx: ServerContext) {
         return `### #${i + 1} (${e.score.toFixed(4)}) [${e.project}] ${path.relative(process.cwd(), absoluteFile)}\n\`\`\`\n${e.text}\n\`\`\``;
       }).join("\n\n");
       return { content: [{ type: "text", text: results }] };
-    } catch (error: any) {
-      return { content: [{ type: "text", text: `Error: ${error.message}` }], isError: true };
-    }
   }
 }

@@ -12,6 +12,7 @@ import {
 import { SYMBOL_INDEX_PATH } from "../config.js";
 import { guardedCompletionPost } from "../helpers/rate-guard.js";
 import { trackUsage } from "../helpers/pricing.js";
+import { withErrorHandler } from "../helpers/error-handler.js";
 import fs from "fs/promises";
 import path from "path";
 import semver from "semver";
@@ -65,7 +66,9 @@ export function registerAnalysisTools(ctx: ServerContext) {
   const tools = [
     {
       name: "correlate_errors",
+      title: "Correlate Multi-System Errors",
       description: "Analyze log snippets from multiple systems to find root causes and correlations",
+      annotations: { openWorldHint: true },
       inputSchema: {
         type: "object",
         properties: {
@@ -86,7 +89,9 @@ export function registerAnalysisTools(ctx: ServerContext) {
     },
     {
       name: "dependency_graph",
+      title: "Dependency Graph Analysis",
       description: "Analyze shared dependencies and semver conflicts across multiple projects",
+      annotations: { readOnlyHint: true },
       inputSchema: {
         type: "object",
         properties: {
@@ -104,8 +109,8 @@ export function registerAnalysisTools(ctx: ServerContext) {
   return {
     tools,
     handlers: {
-      correlate_errors: handleCorrelateErrors,
-      dependency_graph: handleDependencyGraph,
+      correlate_errors: withErrorHandler("correlate_errors", handleCorrelateErrors),
+      dependency_graph: withErrorHandler("dependency_graph", handleDependencyGraph),
     }
   };
 
@@ -113,16 +118,12 @@ export function registerAnalysisTools(ctx: ServerContext) {
     const { logs } = args;
     const formattedLogs = logs.map(l => `SYSTEM: ${l.system_name}\nLOGS:\n${l.content}\n---`).join("\n\n");
     const systemPrompt = `You are an expert Reliability Engineer. Find correlations and identify root causes in these logs.`;
-    try {
-      const response = await guardedCompletionPost(ctx, "anthropic/claude-sonnet-4.6", {
-        model: "anthropic/claude-sonnet-4.6",
-        messages: [{ role: "system", content: systemPrompt }, { role: "user", content: `Analyze logs:\n\n${formattedLogs}` }]
-      });
-      trackUsage(ctx, response.data.model, response.data.usage);
-      return { content: [{ type: "text", text: response.data.choices[0].message.content }] };
-    } catch (error: any) {
-      return { content: [{ type: "text", text: `Error: ${error.message}` }], isError: true };
-    }
+    const response = await guardedCompletionPost(ctx, "anthropic/claude-sonnet-4.6", {
+      model: "anthropic/claude-sonnet-4.6",
+      messages: [{ role: "system", content: systemPrompt }, { role: "user", content: `Analyze logs:\n\n${formattedLogs}` }]
+    });
+    trackUsage(ctx, response.data.model, response.data.usage);
+    return { content: [{ type: "text", text: response.data.choices[0].message.content }] };
   }
 
   function parseCargoToml(content: string): { name?: string; version?: string; deps: Record<string, string> } {
@@ -314,9 +315,8 @@ export function registerAnalysisTools(ctx: ServerContext) {
       max_depth = 5
     } = args;
 
-    try {
-      const symbolIndex: SymbolIndex = JSON.parse(await fs.readFile(SYMBOL_INDEX_PATH, "utf-8"));
-      const targets = filterRepos?.length ? Object.keys(symbolIndex).filter(n => filterRepos.includes(n)) : Object.keys(symbolIndex);
+    const symbolIndex: SymbolIndex = JSON.parse(await fs.readFile(SYMBOL_INDEX_PATH, "utf-8"));
+    const targets = filterRepos?.length ? Object.keys(symbolIndex).filter(n => filterRepos.includes(n)) : Object.keys(symbolIndex);
       
       const repoInfoMap: Record<string, RepoInfo & { transitiveCount?: number }> = {};
       const warnings: string[] = [];
@@ -557,8 +557,5 @@ export function registerAnalysisTools(ctx: ServerContext) {
       }
 
       return { content: [{ type: "text", text: sections.join("\n\n") }] };
-    } catch (error: any) {
-      return { content: [{ type: "text", text: `Error: ${error.message}` }], isError: true };
-    }
   }
 }

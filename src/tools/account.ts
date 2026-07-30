@@ -2,17 +2,22 @@
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { ServerContext } from "../types.js";
+import { withErrorHandler } from "../helpers/error-handler.js";
 
 export function registerAccountTools(ctx: ServerContext) {
   const tools = [
     {
       name: "get_balance",
+      title: "Get Credit Balance",
       description: "Check your OpenRouter credit balance",
+      annotations: { readOnlyHint: true },
       inputSchema: { type: "object", properties: {} },
     },
     {
       name: "get_key_info",
+      title: "Get API Key Info",
       description: "Get information about the current API key (limits, usage, etc.)",
+      annotations: { readOnlyHint: true },
       inputSchema: { type: "object", properties: {} },
     }
   ];
@@ -20,26 +25,18 @@ export function registerAccountTools(ctx: ServerContext) {
   return {
     tools,
     handlers: {
-      get_balance: handleGetBalance,
-      get_key_info: handleGetKeyInfo,
+      get_balance: withErrorHandler("get_balance", handleGetBalance),
+      get_key_info: withErrorHandler("get_key_info", handleGetKeyInfo),
     }
   };
 
   async function handleGetBalance() {
-    try {
-      const response = await ctx.axiosInstance.get("/credits");
-      return { content: [{ type: "text", text: JSON.stringify(response.data.data, null, 2) }] };
-    } catch (error: any) {
-      return { content: [{ type: "text", text: `Error fetching balance: ${error.response?.data?.error?.message || error.message}` }], isError: true };
-    }
+    const response = await ctx.axiosInstance.get("/credits");
+    return { content: [{ type: "text", text: JSON.stringify(response.data.data, null, 2) }] };
   }
 
   async function handleGetKeyInfo() {
-    try {
-      const response = await ctx.axiosInstance.get("/key");
-      return { content: [{ type: "text", text: JSON.stringify(response.data.data, null, 2) }] };
-    } catch (error: any) {
-      return { content: [{ type: "text", text: `Error fetching key info: ${error.response?.data?.error?.message || error.message}` }], isError: true };
-    }
+    const response = await ctx.axiosInstance.get("/key");
+    return { content: [{ type: "text", text: JSON.stringify(response.data.data, null, 2) }] };
   }
 }

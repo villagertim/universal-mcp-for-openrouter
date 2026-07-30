@@ -11,7 +11,9 @@ export function registerVerifyTools(ctx: ServerContext) {
   const tools = [
     {
       name: "verify_setup",
+      title: "Verify Server Setup",
       description: "Perform diagnostic checks on OpenRouter credentials, files, and server environment",
+      annotations: { readOnlyHint: true, idempotentHint: true },
       inputSchema: { type: "object", properties: {} },
     }
   ];

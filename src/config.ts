@@ -9,7 +9,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Root and Data Directories
 export const ROOT_DIR = path.join(__dirname, "..");
-export const DATA_DIR = ROOT_DIR; // Currently using project root for state JSONs
+export const DATA_DIR = process.env.OPENROUTER_MCP_DATA_DIR ?? ROOT_DIR;
 export const USER_ENV_PATH = process.env.OPENROUTER_MCP_ENV_PATH
   ?? path.join(os.homedir(), ".config", "openrouter-mcp", ".env");
 
