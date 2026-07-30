@@ -109,7 +109,7 @@ This prevents accidental exposure of credentials to external network suppliers a
 
 ```
 # Direct Model completions (custom or auto)
-chat_completion(prompt: "Explain how JWT refresh tokens work", model: "anthropic/claude-3-5-sonnet")
+chat_completion(prompt: "Explain how JWT refresh tokens work", model: "anthropic/claude-sonnet-4.6")
 
 # Thin preset completion (smart, cheap, fast, coder, creative)
 chat_with_preset(preset: "fast", prompt: "Summarize this in 3 bullets: ...")
@@ -119,7 +119,7 @@ chat_routed(prompt: "Write a high-performance HTTP gateway", strictness: "qualit
 
 # Parallel Multi-Model Consensus Peer Review (polls up to 5 models concurrently)
 chat_ensemble(
-  models: ["deepseek/deepseek-chat", "anthropic/claude-3.5-sonnet", "google/gemini-1.5-pro"],
+  models: ["deepseek/deepseek-chat", "anthropic/claude-sonnet-4.6", "google/gemini-3.1-pro-preview"],
   prompt: "Auditing constant-time cryptographic checks for timing attacks"
 )
 ```
@@ -249,5 +249,4 @@ Copy and paste these templates directly into your bot's system instructions or c
 ## ⚖️ Trademark Disclaimer
 
 *"Universal MCP for OpenRouter" is an independent, community-developed project. It is not affiliated with, endorsed by, or officially connected to OpenRouter, Inc. "OpenRouter" is a trademark of OpenRouter, Inc.*
-
 

@@ -9,13 +9,13 @@ When generating high-risk, mission-critical code modules (such as security authe
 
 1. **Leverage Native Multi-Model Consensus (Preferred):**
    - Call the `chat_ensemble` tool to execute parallel queries across up to 5 distinct candidate models simultaneously (e.g. `anthropic/claude-3-opus`, `openai/gpt-4o`, `deepseek/deepseek-chat`).
-   - Define a strong expert reviewer as the `synthesizer` model (defaults to `google/gemini-1.5-pro`).
+   - Define a strong expert reviewer as the `synthesizer` model (defaults to `google/gemini-3.1-pro-preview`).
    - The server will dynamically execute these requests in parallel, enforce pre-flight pessimistic budget checks, and use the expert synthesizer to critique responses and build a unified, grounded, hallucination-free optimal answer.
 
 2. **Manual Peer-Review Fallback Workflow:**
    - If a custom structured review flow is needed:
      - Generate the initial implementation using the primary coding model preset (`chat_completion` with Claude 3.5 Sonnet).
-     - Take the generated draft code and invoke a `chat_completion` call targeting a different premium model provider (e.g., `openai/gpt-4o` or `google/gemini-1.5-pro`).
+      - Take the generated draft code and invoke a `chat_completion` call targeting a different premium model provider (e.g., `openai/gpt-4o` or `google/gemini-3.1-pro-preview`).
      - Pass the draft code with a structured auditor prompt:
        `"You are a Senior Security Auditor and QA Engineer. Audit this code for logical edge cases, race conditions, memory leaks, security vulnerabilities, or performance bottlenecks. Suggest exact modifications if flaws are found."`
      - Integrate the auditor's suggestions and present the final synthesized code alongside the collapsible peer review accordions to the user.

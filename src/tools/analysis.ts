@@ -114,8 +114,8 @@ export function registerAnalysisTools(ctx: ServerContext) {
     const formattedLogs = logs.map(l => `SYSTEM: ${l.system_name}\nLOGS:\n${l.content}\n---`).join("\n\n");
     const systemPrompt = `You are an expert Reliability Engineer. Find correlations and identify root causes in these logs.`;
     try {
-      const response = await guardedCompletionPost(ctx, "anthropic/claude-3.5-sonnet", {
-        model: "anthropic/claude-3.5-sonnet",
+      const response = await guardedCompletionPost(ctx, "anthropic/claude-sonnet-4.6", {
+        model: "anthropic/claude-sonnet-4.6",
         messages: [{ role: "system", content: systemPrompt }, { role: "user", content: `Analyze logs:\n\n${formattedLogs}` }]
       });
       trackUsage(ctx, response.data.model, response.data.usage);
@@ -554,4 +554,3 @@ export function registerAnalysisTools(ctx: ServerContext) {
     }
   }
 }
-

@@ -23,7 +23,7 @@ describe("Vision Capabilities (#4)", () => {
       circuitBreakerMap: new Map(),
       tokenBucketMap: new Map(),
       pricingCache: {
-        "google/gemini-flash-1.5": { prompt: "0.0000001", completion: "0.0000003" }
+        "google/gemini-3.1-flash-lite": { prompt: "0.0000001", completion: "0.0000003" }
       },
     };
     
@@ -35,7 +35,7 @@ describe("Vision Capabilities (#4)", () => {
     
     mockAxios.post.mockResolvedValue({
       data: {
-        model: "google/gemini-flash-1.5",
+        model: "google/gemini-3.1-flash-lite",
         choices: [{ message: { content: "I see a blue sky." } }],
         usage: { prompt_tokens: 100, completion_tokens: 50 }
       }
@@ -47,6 +47,7 @@ describe("Vision Capabilities (#4)", () => {
     });
 
     expect(mockAxios.post).toHaveBeenCalledWith("/chat/completions", expect.objectContaining({
+      model: "google/gemini-3.1-flash-lite",
       messages: [
         {
           role: "user",
@@ -67,7 +68,7 @@ describe("Vision Capabilities (#4)", () => {
 
     mockAxios.post.mockResolvedValue({
       data: {
-        model: "google/gemini-flash-1.5",
+        model: "google/gemini-3.1-flash-lite",
         choices: [{ message: { content: "This is a local screenshot." } }],
         usage: { prompt_tokens: 150, completion_tokens: 30 }
       }
@@ -80,6 +81,7 @@ describe("Vision Capabilities (#4)", () => {
 
     expect(fs.readFile).toHaveBeenCalledWith("/tmp/screenshot.png");
     expect(mockAxios.post).toHaveBeenCalledWith("/chat/completions", expect.objectContaining({
+      model: "google/gemini-3.1-flash-lite",
       messages: [
         {
           role: "user",

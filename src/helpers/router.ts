@@ -21,11 +21,11 @@ export function estimateTokens(text: string): number {
 // Built-in high-quality static fallback catalog in case disk cache loading fails or is empty
 const STATIC_REGISTRY_BACKUP: OpenRouterModel[] = [
   { id: "google/gemini-3.1-flash-lite", name: "Gemini 3.1 Flash Lite", context_length: 1048576, pricing: { prompt: "0.075", completion: "0.30" } },
-  { id: "qwen/qwen-3.6-flash", name: "Qwen 3.6 Flash", context_length: 32768, pricing: { prompt: "0.07", completion: "0.14" } },
+  { id: "qwen/qwen3.7-flash", name: "Qwen3.7 Flash", context_length: 1000000, pricing: { prompt: "0.07", completion: "0.14" } },
   { id: "openai/gpt-5.4-nano", name: "GPT-5.4 Nano", context_length: 128000, pricing: { prompt: "0.075", completion: "0.30" } },
   { id: "anthropic/claude-sonnet-4.6", name: "Claude 3.5 Sonnet (v2)", context_length: 200000, pricing: { prompt: "3.00", completion: "15.00" } },
   { id: "openai/gpt-5.5", name: "GPT-5.5", context_length: 128000, pricing: { prompt: "5.00", completion: "15.00" } },
-  { id: "google/gemini-3.1-pro", name: "Gemini 3.1 Pro", context_length: 2097152, pricing: { prompt: "1.25", completion: "5.00" } }
+  { id: "google/gemini-3.1-pro-preview", name: "Gemini 3.1 Pro Preview", context_length: 1048576, pricing: { prompt: "1.25", completion: "5.00" } }
 ];
 
 // Lists of model families/IDs mapped to Frontier (Tier 1) vs. Flash (Tier 2) to support quality-aware routing

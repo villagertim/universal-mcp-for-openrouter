@@ -30,9 +30,9 @@ Done (May 2026). Added official trademark notice section to the bottom of `READM
 
 ---
 
-### 🟡 #5 — Verify All Model Examples Are Current
+### ✅ #5 — Verify All Model Examples Are Current
 
-Model names in the User Manual were verified against the live OpenRouter catalog on **April 27, 2026**. Model availability changes frequently. Re-verify before release by running `list_models`.
+Verified against the live OpenRouter catalog on **July 29, 2026**. Refreshed stale runtime defaults, static fallbacks, and public examples; added regression coverage for preset and fallback IDs. Model availability changes frequently, so re-verify before release by running `list_models`.
 
 Files containing model references:
 - `USER_MANUAL.md` — Chapters 2, 4, 5, 11, 14

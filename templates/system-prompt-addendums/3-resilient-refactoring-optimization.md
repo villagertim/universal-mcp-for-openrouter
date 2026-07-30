@@ -13,7 +13,7 @@ When charged with large-scale codebases refactoring, bulk code transformations, 
 
 2. **Outage/Rate-Limit Mitigation (Fallback Arrays):**
    - When calling `chat_completion` for high-importance codebase alterations, do not rely on a single primary model.
-   - Configure a fallback list in the `models` array argument (e.g., set `model` to `anthropic/claude-3.5-sonnet` and define fallbacks like `["openai/gpt-5.5", "google/gemini-3.5-pro", "x-ai/grok-4.20"]` inside the `models` parameter).
+   - Configure a fallback list in the `models` array argument (e.g., set `model` to `anthropic/claude-sonnet-4.6` and define fallbacks like `["openai/gpt-5.5", "google/gemini-3.1-pro-preview", "x-ai/grok-4.20"]` inside the `models` parameter).
    - This ensures that if the primary model is throttled, rate-limited, or overloaded, the MCP server automatically completes the task using the next available engine.
 ```
 

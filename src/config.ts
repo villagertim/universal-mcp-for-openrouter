@@ -16,10 +16,10 @@ export const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";
 
 export const PRESETS: Record<string, string[]> = {
   "smart": ["anthropic/claude-opus-4.7", "openai/gpt-5.5", "x-ai/grok-4.20"],
-  "cheap": ["openai/gpt-5.4-nano", "qwen/qwen-3.6-flash", "google/gemini-3.1-flash-lite"],
-  "creative": ["openai/gpt-5.5", "anthropic/claude-sonnet-4.6", "google/gemini-3.1-pro"],
-  "fast": ["google/gemini-3.1-flash-lite", "openai/gpt-5.4-nano", "qwen/qwen-3.6-flash"],
-  "coder": ["anthropic/claude-sonnet-4.6", "openai/gpt-5.4", "google/gemini-3.1-pro"],
+  "cheap": ["openai/gpt-5.4-nano", "qwen/qwen3.7-flash", "google/gemini-3.1-flash-lite"],
+  "creative": ["openai/gpt-5.5", "anthropic/claude-sonnet-4.6", "google/gemini-3.1-pro-preview"],
+  "fast": ["google/gemini-3.1-flash-lite", "openai/gpt-5.4-nano", "qwen/qwen3.7-flash"],
+  "coder": ["anthropic/claude-sonnet-4.6", "openai/gpt-5.4", "qwen/qwen3-coder-next"],
 };
 
 export const DEFAULT_RATE_CONFIG: RateLimiterConfig = {
@@ -30,7 +30,7 @@ export const DEFAULT_RATE_CONFIG: RateLimiterConfig = {
   fallback_price_multiplier: 1.5,
 };
 
-export const DEFAULT_SYNTHESIZER_MODEL = "google/gemini-1.5-pro";
+export const DEFAULT_SYNTHESIZER_MODEL = "google/gemini-3.1-pro-preview";
 
 // State Paths
 export const RATE_CONFIG_PATH = path.join(DATA_DIR, "rate_config.json");

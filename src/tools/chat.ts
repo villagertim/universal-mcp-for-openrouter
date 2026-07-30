@@ -29,7 +29,7 @@ export function registerChatTools(ctx: ServerContext) {
         properties: {
           model: {
             type: "string",
-            description: "The primary model to use (e.g., 'anthropic/claude-3-5-sonnet'). Defaults to 'openrouter/auto'.",
+            description: "The primary model to use (e.g., 'anthropic/claude-sonnet-4.6'). Defaults to 'openrouter/auto'.",
             default: "openrouter/auto"
           },
           models: {
@@ -107,7 +107,7 @@ export function registerChatTools(ctx: ServerContext) {
           },
           target_model: {
             type: "string",
-            description: "The model you intend to use this prompt with (e.g., 'anthropic/claude-3-5-sonnet')"
+            description: "The model you intend to use this prompt with (e.g., 'anthropic/claude-sonnet-4.6')"
           }
         },
         required: ["prompt"]
@@ -122,7 +122,7 @@ export function registerChatTools(ctx: ServerContext) {
           models: {
             type: "array",
             items: { type: "string" },
-            description: "The list of models to query in parallel (maximum 5, e.g., ['deepseek/deepseek-chat', 'anthropic/claude-3.5-sonnet'])"
+            description: "The list of models to query in parallel (maximum 5, e.g., ['deepseek/deepseek-chat', 'anthropic/claude-sonnet-4.6'])"
           },
           prompt: {
             type: "string",
@@ -134,7 +134,7 @@ export function registerChatTools(ctx: ServerContext) {
           },
           synthesizer_model: {
             type: "string",
-            description: "The model used to merge and optimize outputs (e.g., 'google/gemini-1.5-pro')"
+            description: "The model used to merge and optimize outputs (e.g., 'google/gemini-3.1-pro-preview')"
           },
           temperature: {
             type: "number",
@@ -369,8 +369,8 @@ export function registerChatTools(ctx: ServerContext) {
     const { prompt, target_model = "general" } = args;
     const systemPrompt = `You are an expert Prompt Engineer. Rewrite this prompt to be high-performing. Return JSON: { "optimized_prompt": "...", "improvements": ["..."] }`;
     try {
-      const response = await guardedCompletionPost(ctx, "anthropic/claude-3.5-sonnet", {
-        model: "anthropic/claude-3.5-sonnet",
+      const response = await guardedCompletionPost(ctx, "anthropic/claude-sonnet-4.6", {
+        model: "anthropic/claude-sonnet-4.6",
         messages: [{ role: "system", content: systemPrompt }, { role: "user", content: `Optimize: ${prompt}` }],
         response_format: { type: "json_object" }
       });

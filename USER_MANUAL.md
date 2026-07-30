@@ -156,7 +156,7 @@ You will see JSON throughout this manual when we show what the AI sends to tools
 {
   "image_url": "https://example.com/photo.jpg",
   "prompt": "What objects are visible in this image?",
-  "model": "google/gemini-flash-1.5"
+  "model": "google/gemini-3.1-flash-lite"
 }
 ```
 
@@ -529,7 +529,7 @@ START HERE
     ▼
 Does this task involve images?
     │
-    ├─ YES → Use vision_analyze with google/gemini-flash-1.5
+    ├─ YES → Use vision_analyze with google/gemini-3.1-flash-lite
     │
     └─ NO
         │
@@ -1146,14 +1146,14 @@ In addition to the generated chat completion, the tool returns detailed metadata
     }
   ],
   "routing_metadata": {
-    "model_selected": "anthropic/claude-3-5-sonnet",
+    "model_selected": "anthropic/claude-sonnet-4.6",
     "prompt_tokens_estimated": 128,
     "cost_per_1m_prompt_usd": 3.0,
-    "routing_reason": "Quality mode selected anthropic/claude-3-5-sonnet from Tier 1 (frontier models) as the most cost-efficient candidate within budget.",
+    "routing_reason": "Quality mode selected anthropic/claude-sonnet-4.6 from Tier 1 (frontier models) as the most cost-efficient candidate within budget.",
     "candidates_considered": [
-      "anthropic/claude-3-5-sonnet",
-      "google/gemini-1.5-pro",
-      "meta-llama/llama-3.1-405b"
+      "anthropic/claude-sonnet-4.6",
+      "google/gemini-3.1-pro-preview",
+      "meta-llama/llama-3.3-70b-instruct"
     ],
     "failover_models_tried": []
   }
@@ -1165,7 +1165,7 @@ In addition to the generated chat completion, the tool returns detailed metadata
 ### Tool 2c: `chat_ensemble` (Consensus Multi-Model Review)
 
 **What it does:**
-Executes a highly resilient **Parallel Multi-Model Consensus Audit**. Instead of relying on a single AI model, this tool queries up to 5 distinct models simultaneously. It aggregates their responses and feeds them into an expert synthesis model (by default, `google/gemini-1.5-pro`) acting as a master peer reviewer. The synthesizer critiques the candidate responses, resolves logical contradictions, and synthesizes a single, optimal, hallucination-free consensus answer.
+Executes a highly resilient **Parallel Multi-Model Consensus Audit**. Instead of relying on a single AI model, this tool queries up to 5 distinct models simultaneously. It aggregates their responses and feeds them into an expert synthesis model (by default, `google/gemini-3.1-pro-preview`) acting as a master peer reviewer. The synthesizer critiques the candidate responses, resolves logical contradictions, and synthesizes a single, optimal, hallucination-free consensus answer.
 
 **When to use it:**
 - For **mission-critical tasks** requiring extreme accuracy, such as scanning security-sensitive code, diagnosing complex system architectures, or auditing contracts.
@@ -1176,10 +1176,10 @@ Executes a highly resilient **Parallel Multi-Model Consensus Audit**. Instead of
 
 | Parameter | Required | Type | Default | Description |
 |-----------|----------|------|---------|-------------|
-| `models` | **Yes** | array of strings | — | Up to 5 model IDs to query in parallel (e.g., `["deepseek/deepseek-chat", "anthropic/claude-3.5-sonnet"]`) |
+| `models` | **Yes** | array of strings | — | Up to 5 model IDs to query in parallel (e.g., `["deepseek/deepseek-chat", "anthropic/claude-sonnet-4.6"]`) |
 | `prompt` | **Yes** | string | — | The main task prompt to send to all models |
 | `system_prompt` | No | string | — | Optional system prompt shaping candidate behavior |
-| `synthesizer_model` | No | string | `"google/gemini-1.5-pro"` | The expert peer-reviewer model used to critique and merge outputs |
+| `synthesizer_model` | No | string | `"google/gemini-3.1-pro-preview"` | The expert peer-reviewer model used to critique and merge outputs |
 | `temperature` | No | number | `0.7` | Sampling temperature (0-2) for candidate queries |
 | `max_tokens` | No | number | — | Maximum tokens to generate per candidate response |
 
@@ -1195,7 +1195,7 @@ Executes a highly resilient **Parallel Multi-Model Consensus Audit**. Instead of
 **Example Request:**
 ```json
 {
-  "models": ["deepseek/deepseek-chat", "anthropic/claude-3.5-sonnet", "google/gemini-1.5-pro"],
+  "models": ["deepseek/deepseek-chat", "anthropic/claude-sonnet-4.6", "google/gemini-3.1-pro-preview"],
   "prompt": "Evaluate this JavaScript code block for timing attacks: if (input === password) { return true; }"
 }
 ```
@@ -1210,11 +1210,11 @@ Executes a highly resilient **Parallel Multi-Model Consensus Audit**. Instead of
     },
     {
       "type": "text",
-      "text": "\n\n---\n### Ensemble Synthesis Metadata\n* **Synthesizer:** google/gemini-1.5-pro\n* **Contributing Models:**\n* **deepseek/deepseek-chat** (Success, Latency: 1845ms)\n* **anthropic/claude-3.5-sonnet** (Success, Latency: 2210ms)\n* **google/gemini-1.5-pro** (Success, Latency: 1402ms)"
+      "text": "\n\n---\n### Ensemble Synthesis Metadata\n* **Synthesizer:** google/gemini-3.1-pro-preview\n* **Contributing Models:**\n* **deepseek/deepseek-chat** (Success, Latency: 1845ms)\n* **anthropic/claude-sonnet-4.6** (Success, Latency: 2210ms)\n* **google/gemini-3.1-pro-preview** (Success, Latency: 1402ms)"
     },
     {
       "type": "text",
-      "text": "\n\n<details>\n<summary>🔍 View Original Candidate Responses</summary>\n\n### Original Output from **deepseek/deepseek-chat**:\n[Raw text...]\n\n### Original Output from **anthropic/claude-3.5-sonnet**:\n[Raw text...]\n\n</details>"
+      "text": "\n\n<details>\n<summary>🔍 View Original Candidate Responses</summary>\n\n### Original Output from **deepseek/deepseek-chat**:\n[Raw text...]\n\n### Original Output from **anthropic/claude-sonnet-4.6**:\n[Raw text...]\n\n</details>"
     }
   ]
 }
@@ -1287,7 +1287,7 @@ openai/gpt-5.5
   Output: "0.000015" per token
   Context: 1,050,000 tokens
 
-google/gemini-flash-1.5
+google/gemini-3.1-flash-lite
   Input:  "0.00000025" per token
   Output: "0.0000015" per token
   Context: 1,048,576 tokens
@@ -2145,7 +2145,7 @@ Sends an image (from your computer or a URL) to a vision-capable AI model and re
 | `image_path` | No* | string | — | Absolute path or home-relative path (e.g., `~/screenshots/nav.png`) |
 | `image_url` | No* | string | — | URL of an image to analyze |
 | `prompt` | No | string | "Describe this image in detail." | What to look for or analyze |
-| `model` | No | string | `google/gemini-flash-1.5` | The vision model to use |
+| `model` | No | string | `google/gemini-3.1-flash-lite` | The vision model to use |
 
 *\*You must provide either `image_path` or `image_url` (at least one).*
 
@@ -2176,7 +2176,7 @@ Based on this, the server receives:
 **Tips:**
 - This is one of the key tools that may justify using OpenRouter — if your locally selected model does not have vision capabilities, `vision_analyze` provides that capability.
 - **Tilde Home Support:** The `image_path` parameter supports tilde expansion (`~` or `~/`), making it simple to reference image files in user directories (e.g., `~/Desktop/screenshot.png`).
-- The default model (`google/gemini-flash-1.5`) is cost-effective for most vision tasks.
+- The default model (`google/gemini-3.1-flash-lite`) is cost-effective for most vision tasks.
 - Be specific in your `prompt`. "Describe this image" gives a general description. "Does this login form have accessibility issues?" gives a focused, actionable answer.
 
 ---

@@ -212,19 +212,19 @@ export function getDynamicBackups(ctx: ServerContext, primaryModel: string, need
 
     if (isPremium) {
       const premiumStatic = [
-        "anthropic/claude-3.5-sonnet",
-        "google/gemini-1.5-pro",
+        "anthropic/claude-sonnet-4.6",
+        "google/gemini-3.1-pro-preview",
         "openai/gpt-4o",
-        "anthropic/claude-3-5-haiku"
+        "anthropic/claude-haiku-4.5"
       ];
       for (const m of premiumStatic) {
         if (isCandidate(m)) fallbacks.push(m);
       }
     } else {
       const cheapStatic = [
-        "google/gemini-1.5-flash",
+        "google/gemini-3.1-flash-lite",
         "openai/gpt-4o-mini",
-        "anthropic/claude-3-5-haiku",
+        "anthropic/claude-haiku-4.5",
         "meta-llama/llama-3.1-8b-instruct",
         "qwen/qwen-2.5-72b-instruct"
       ];

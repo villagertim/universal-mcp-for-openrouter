@@ -31,8 +31,8 @@ export function registerVisionTools(ctx: ServerContext) {
           },
           model: {
             type: "string",
-            description: "The vision model to use (defaults to google/gemini-flash-1.5)",
-            default: "google/gemini-flash-1.5"
+            description: "The vision model to use (defaults to google/gemini-3.1-flash-lite)",
+            default: "google/gemini-3.1-flash-lite"
           }
         }
       },
@@ -47,7 +47,7 @@ export function registerVisionTools(ctx: ServerContext) {
   };
 
   async function handleVisionAnalyze(args: VisionAnalyzeArgs) {
-    const { image_path, image_url, prompt = "Describe this image in detail.", model = "google/gemini-flash-1.5" } = args;
+    const { image_path, image_url, prompt = "Describe this image in detail.", model = "google/gemini-3.1-flash-lite" } = args;
     try {
       let imageUrlToSend = image_url;
       if (image_path) {
@@ -68,4 +68,3 @@ export function registerVisionTools(ctx: ServerContext) {
     }
   }
 }
-
