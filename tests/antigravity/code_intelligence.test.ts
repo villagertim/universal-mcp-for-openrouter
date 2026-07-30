@@ -108,7 +108,7 @@ describe("Code Intelligence & Analysis (#6)", () => {
     const result = await handlers.dependency_graph({ check_conflicts: true });
 
     expect(result.content[0].text).toContain("Analyzed 2 repos");
-    expect(result.content[0].text).toContain("shared packages");
+    expect(result.content[0].text).toContain("Shared & Duplicated Packages");
     expect(result.content[0].text).toContain("lodash");
     expect(result.content[0].text).toContain("Semver Conflicts");
   });

@@ -53,6 +53,23 @@ Every `/chat/completions` call passes three pre-flight checks before the request
 - **Lockfile-Based Sweep**: Direct, fast offline parsing of `package-lock.json` and `Cargo.lock` files to sweep thousands of transitive dependencies in sub-milliseconds without triggering heavy sub-processes.
 - **Path Tracing & Semver Audits**: Exposes focus-path tracing back to zero-in-degree roots and detects duplicate nested packages with semver conflicts.
 
+### Phase 8 — Native Primitives & Security Modernization ✅
+**Resources, Prompts, Domain Namespaces & Input Sanitization**
+- **Native MCP Resources**: Implemented `openrouter://models`, `openrouter://budget/status`, `openrouter://account/balance`, and `openrouter://memory/all` URI schemas for passive data reading.
+- **Native MCP Prompts**: Exposed structured agent system prompt templates (`cost-aware-orchestration`, `multi-model-consensus`, `autonomous-budget-safety`, etc.) via native MCP prompt discovery.
+### Phase 9 — Technical Improvements & Multi-Manager Lockfile Sweeping ✅
+**Expanded Secret Firewall, Lockfile Parsers, Pricing Cache TTL & VectorStore Abstraction**
+- **Expanded Secret Redaction Firewall**: Extended local sanitization rules in `rate-guard.ts` to detect and mask Anthropic API keys (`sk-ant-api`), GitHub PATs (`ghp_` / `github_pat_`), AWS Access Keys (`AKIA`), and Google Cloud OAuth Tokens (`ya29`).
+- **Multi-Manager Lockfile Parsing**: Added sub-millisecond Yarn (`yarn.lock`) and pnpm (`pnpm-lock.yaml`) parsers to `dependency_graph` alongside npm and Cargo.
+- **Pricing Cache TTL Policy**: Implemented 24-hour timestamp tracking in `pricing_cache.json` with a stale-while-revalidate policy to eliminate unneeded startup background network calls.
+- **VectorStore Abstraction**: Extracted `VectorStore` interface and `JsonVectorStore` implementation in `src/helpers/vector-store.ts` for scalable vector memory persistence.
+
+### Phase 10 — High-Payoff Performance & Resilience ✅
+**File Watcher Directory Pruning, Retry-After Headers & Adaptive Exponential Backoff**
+- **Intelligent File Watcher Pruning**: Expanded `CODE_SKIP_DIRS` to prune build outputs, caches, virtualenvs, and IDE folders (`coverage`, `.venv`, `target`, `.turbo`, `.cache`, `.output`, `.nuxt`, `.svelte-kit`, `.out`, `out`, `.parcel-cache`) from real-time filesystem watchers.
+- **HTTP `Retry-After` Header Parsing**: Intercepts `retry-after` and `retry-after-ms` response headers on HTTP 429 rate limit errors in `rate-guard.ts`.
+- **Adaptive Circuit Breaker Backoff**: Replaced rigid 60s lockouts with dynamic exponential backoff starting at 5s (`5s ➔ 10s ➔ 20s ➔ 40s ➔ 60s cap`), returning healthy models to service faster.
+
 ---
 
 ## What Was Cut and Why
@@ -84,11 +101,13 @@ Every `/chat/completions` call passes three pre-flight checks before the request
 
 | Idea | What it unlocks | Priority | Notes |
 |:---|:---|:---:|:---|
-| **Scalable Semantic Storage (Option F)** | Migrate `context_store.json` to SQLite or pgvector / ChromaDB when chunk counts exceed 10,000. | 🟡 Medium | Retained as technical debt / future enhancement to optimize startup memory and I/O locking at scale. See [scalable-semantic-storage.md](file:///home/tim/dev/projects/openrouter-mcp/blueprints/scalable-semantic-storage.md) for the design layout. |
+| **Scalable Semantic Storage (Option F)** | Migrate `context_store.json` to SQLite or pgvector / ChromaDB when chunk counts exceed 10,000. | 🟡 Medium | Retained as technical debt / future enhancement to optimize startup memory and I/O locking at scale. |
+| **Comprehensive Diagnostic Health Suite** | Expand `verify_setup` tool in `src/tools/verify.ts` to test write permissions for state JSONs, validate API key permissions via OpenRouter's `/auth/key` endpoint, and report V8 process memory footprint. | 🟡 Medium | Diagnostic & troubleshooting suite enhancement. |
+| **Async SSE Streaming Completion Helper** | Add streaming chunk aggregation in `src/tools/chat.ts` for long-running reasoning model completions. | 🟡 Medium | Prevents gateway timeouts on complex prompts. |
 | **Headless CI/CD diff_review (Option G)** | Structured `{ approve: boolean, issues[] }` review gate for automated pull request pipelines. | ⚪ Low | Only useful for headless CI/CD systems where interactive agents are not active. |
 
 ---
 
-*Built by Antigravity · May 22, 2026*
+*Built and Verified by Antigravity · July 29, 2026*
 
 

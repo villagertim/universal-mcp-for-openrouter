@@ -232,7 +232,7 @@ export interface PackageMapEntry {
 }
 
 export interface RepoInfo {
-  type: "npm" | "cargo" | "unknown" | "npm (lockfile)" | "cargo (lockfile)";
+  type: "npm" | "cargo" | "yarn" | "pnpm" | "unknown" | "npm (lockfile)" | "cargo (lockfile)" | "yarn (lockfile)" | "pnpm (lockfile)";
   displayName: string;
   depCount?: number;
   stubbed?: boolean;

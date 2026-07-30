@@ -47,6 +47,10 @@ export const CODE_CHUNK_LINES        = 50;
 export const CODE_CHUNK_STRIDE       = 40;
 export const CODE_MAX_FILE_BYTES     = 50_000;
 export const CODE_DEFAULT_MAX_CHUNKS = 5_000;
-export const CODE_SKIP_DIRS   = new Set(["node_modules", ".git", "build", "dist", ".next", "vendor", "__pycache__"]);
+export const CODE_SKIP_DIRS   = new Set([
+  "node_modules", ".git", "build", "dist", ".next", "vendor", "__pycache__",
+  "coverage", ".venv", "target", ".turbo", ".cache", ".output", ".nuxt",
+  ".svelte-kit", ".out", "out", ".parcel-cache", ".idea", ".vscode"
+]);
 export const CODE_SKIP_EXTS   = new Set([".map"]);
 export const CODE_SOURCE_EXTS = new Set([".ts", ".tsx", ".js", ".jsx", ".py", ".go", ".rs", ".java"]);

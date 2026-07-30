@@ -66,6 +66,9 @@ export async function watchProject(ctx: ServerContext, projectName: string, proj
       if (visited.has(realDir)) return;
       visited.add(realDir);
 
+      const dirName = path.basename(dir);
+      if (CODE_SKIP_DIRS.has(dirName) || CODE_SKIP_DIRS.has(path.basename(realDir))) return;
+
       // System resource guard (protect FDs and inotify ceilings)
       if (watchCount >= MAX_WATCH_SUBDIRS) {
         console.error(`[Watcher] ⚠️ Limit Exceeded: "${projectName}" has > ${MAX_WATCH_SUBDIRS} subdirectories. Safety ceiling applied.`);

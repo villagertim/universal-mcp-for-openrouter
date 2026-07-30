@@ -60,27 +60,83 @@ export function recordSuccess(ctx: ServerContext, model: string): void {
   }
 }
 
-export function recordFailure(ctx: ServerContext, model: string): void {
+export function recordFailure(ctx: ServerContext, model: string, error?: any): void {
   const cb = ctx.circuitBreakerMap.get(model) ?? { failures: 0, open_until: 0 };
   const failures = cb.failures + 1;
-  const open_until = failures >= 3 ? Date.now() + 60_000 : 0;
-  ctx.circuitBreakerMap.set(model, { failures, open_until });
-  if (open_until > 0) {
-    console.error(`[RateGuard] 🔴 Circuit breaker OPEN for "${model}" after ${failures} failures. Cooldown: 60s.`);
+  
+  let cooldownMs = 0;
+
+  // 1. Inspect HTTP Retry-After response headers for rate limits (429).
+  //    retry-after-ms (non-standard) is milliseconds; retry-after per RFC 7231 is seconds.
+  const headers = error?.response?.headers;
+  if (headers) {
+    const retryMsHeader = headers["retry-after-ms"] || headers["Retry-After-Ms"];
+    const retryHeader = retryMsHeader ? null : (headers["retry-after"] || headers["Retry-After"]);
+    const raw = retryMsHeader ?? retryHeader;
+    if (raw !== null && raw !== undefined) {
+      const parsed = parseFloat(String(raw));
+      if (!isNaN(parsed) && parsed > 0) {
+        cooldownMs = retryMsHeader ? parsed : parsed * 1000;
+      }
+    }
   }
+
+  // 2. Exponential backoff fallback if no explicit Retry-After header present
+  if (cooldownMs === 0 && failures >= 3) {
+    // 5s, 10s, 20s, 40s, capped at 60s
+    cooldownMs = Math.min(60_000, 5_000 * Math.pow(2, failures - 3));
+  }
+
+  const open_until = cooldownMs > 0 ? Date.now() + cooldownMs : 0;
+  ctx.circuitBreakerMap.set(model, { failures, open_until });
+
+  if (open_until > 0) {
+    const sec = Math.ceil(cooldownMs / 1000);
+    console.error(`[RateGuard] 🔴 Circuit breaker OPEN for "${model}" after ${failures} failures. Cooldown: ${sec}s.`);
+  }
+}
+
+export function sanitizeInputPrompt(text: string): { sanitized: string; flagged: boolean; reason?: string } {
+  if (!text || typeof text !== "string") return { sanitized: text, flagged: false };
+  let sanitized = text;
+  let flagged = false;
+  let reason = "";
+
+  if (/<\|im_start\|>system|<\|im_end\|>|\[SYSTEM_INSTRUCTION_OVERRIDE\]/i.test(sanitized)) {
+    sanitized = sanitized.replace(/<\|im_start\|>system|<\|im_end\|>|\[SYSTEM_INSTRUCTION_OVERRIDE\]/gi, "[SANITIZED_DELIMITER]");
+    flagged = true;
+    reason = "Context poisoning / system delimiter attempt detected";
+  }
+
+  sanitized = redactedSecretsString(sanitized);
+
+  return { sanitized, flagged, reason };
+}
+
+function redactedSecretsString(str: string): string {
+  let redacted = str;
+  // OpenRouter Key
+  redacted = redacted.replace(/sk-or-v1-[a-zA-Z0-9]{32,128}/gi, "[REDACTED]");
+  // OpenAI Key
+  redacted = redacted.replace(/sk-proj-[a-zA-Z0-9_-]{32,128}/gi, "[REDACTED]");
+  // Anthropic API Key
+  redacted = redacted.replace(/sk-ant-api[0-9a-zA-Z_-]{20,128}/gi, "[REDACTED]");
+  // GitHub Personal Access Tokens
+  redacted = redacted.replace(/ghp_[a-zA-Z0-9]{36}/gi, "[REDACTED]");
+  redacted = redacted.replace(/github_pat_[a-zA-Z0-9_]{82}/gi, "[REDACTED]");
+  // AWS Access Key ID
+  redacted = redacted.replace(/AKIA[0-9A-Z]{16}/g, "[REDACTED]");
+  // Google Cloud OAuth Token
+  redacted = redacted.replace(/ya29\.[a-zA-Z0-9_-]{20,200}/gi, "[REDACTED]");
+  // SSH / Private key blocks
+  redacted = redacted.replace(/-----BEGIN\s+[A-Z0-9\s_-]+KEY-----[\s\S]+?-----END\s+[A-Z0-9\s_-]+KEY-----/gi, "[REDACTED]");
+  return redacted;
 }
 
 export function redactSecrets(obj: any): any {
   if (obj === null || obj === undefined) return obj;
   if (typeof obj === "string") {
-    let redacted = obj;
-    // Regex for OpenRouter Key
-    redacted = redacted.replace(/sk-or-v1-[a-zA-Z0-9]{32,128}/gi, "[REDACTED]");
-    // Regex for OpenAI API Key
-    redacted = redacted.replace(/sk-proj-[a-zA-Z0-9_-]{32,128}/gi, "[REDACTED]");
-    // Regex for SSH / Private key blocks
-    redacted = redacted.replace(/-----BEGIN\s+[A-Z0-9\s_-]+KEY-----[\s\S]+?-----END\s+[A-Z0-9\s_-]+KEY-----/gi, "[REDACTED]");
-    return redacted;
+    return sanitizeInputPrompt(obj).sanitized;
   }
   if (Array.isArray(obj)) {
     return obj.map(item => redactSecrets(item));
@@ -297,7 +353,7 @@ export async function guardedCompletionPost(ctx: ServerContext, model: string, d
       }
       return response;
     } catch (error: any) {
-      recordFailure(ctx, currentModel);
+      recordFailure(ctx, currentModel, error);
       const errMsg = error.response?.data?.error?.message || error.message;
       errors.push({ model: currentModel, error: errMsg });
       console.error(`[Failover] ⚠️ Model "${currentModel}" failed: ${errMsg}`);

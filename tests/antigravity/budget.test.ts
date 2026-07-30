@@ -50,6 +50,7 @@ describe("Budget & Rate Limiting (#7)", () => {
   });
 
   it("guardedCompletionPost should trigger circuit breaker after failures", async () => {
+    mockCtx.rateLimiterConfig.disable_failover = true;
     mockAxios.post.mockRejectedValue(new Error("API Error"));
 
     // 1st failure
@@ -81,6 +82,7 @@ describe("Budget & Rate Limiting (#7)", () => {
   });
 
   it("guardedCompletionPost should respect token bucket rate limits", async () => {
+    mockCtx.rateLimiterConfig.disable_failover = true;
     mockCtx.rateLimiterConfig.max_requests_per_minute = 1;
     mockAxios.post.mockResolvedValue({ data: {} });
 

@@ -5,6 +5,10 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
+  ListResourcesRequestSchema,
+  ReadResourceRequestSchema,
+  ListPromptsRequestSchema,
+  GetPromptRequestSchema,
   ErrorCode,
   McpError,
 } from "@modelcontextprotocol/sdk/types.js";
@@ -20,16 +24,8 @@ import { refreshPricingCache, loadPricingCacheFromDisk } from "./helpers/pricing
 import { loadRateConfig } from "./helpers/config-store.js";
 import { loadToolConfig, ToolConfig } from "./helpers/config-loader.js";
 
-// Tool Modules
-import { registerChatTools } from "./tools/chat.js";
-import { registerModelTools } from "./tools/models.js";
-import { registerAccountTools } from "./tools/account.js";
-import { registerVisionTools } from "./tools/vision.js";
-import { registerContextTools } from "./tools/context.js";
-import { registerCodeTools } from "./tools/code.js";
-import { registerAnalysisTools } from "./tools/analysis.js";
-import { registerBudgetTools } from "./tools/budget.js";
-import { registerVerifyTools } from "./tools/verify.js";
+// Domain Modules & Primitives Orchestration
+import { registerDomainModules } from "./domains/index.js";
 
 // Background Watcher Infrastructure
 import { initializeWatcher, closeAllWatchers } from "./helpers/watcher.js";
@@ -60,6 +56,8 @@ class OpenRouterServer {
       {
         capabilities: {
           tools: {},
+          resources: {},
+          prompts: {},
         },
       }
     );
@@ -97,12 +95,18 @@ class OpenRouterServer {
     // 1. Load persisted rate config
     try {
       this.ctx.rateLimiterConfig = await loadRateConfig();
-    } catch {}
+    } catch (e) {
+      console.error("[init] loadRateConfig failed; falling back to defaults:", e instanceof Error ? e.message : e);
+    }
 
     // 2. Load pricing cache from disk
+    let isFresh = false;
     try {
-      await loadPricingCacheFromDisk(this.ctx);
-    } catch {}
+      const cacheResult = await loadPricingCacheFromDisk(this.ctx);
+      isFresh = cacheResult.isFresh;
+    } catch (e) {
+      console.error("[init] loadPricingCacheFromDisk failed; continuing with empty cache:", e instanceof Error ? e.message : e);
+    }
 
     // 3. Load tool configuration (profile)
     const { config, profileName } = await loadToolConfig();
@@ -110,8 +114,8 @@ class OpenRouterServer {
     // 4. Setup handlers
     this.setupHandlers(config, profileName);
 
-    // 5. Background tasks
-    refreshPricingCache(this.ctx);
+    // 5. Background tasks (conditional refresh based on cache TTL)
+    refreshPricingCache(this.ctx, { isFresh });
 
     // 6. Start real-time incremental watch engine
     initializeWatcher(this.ctx).catch(err => {
@@ -120,24 +124,13 @@ class OpenRouterServer {
   }
 
   private setupHandlers(config: ToolConfig, profileName: string) {
-    // Collect tools and handlers from all modules
-    const allModules = [
-      registerChatTools(this.ctx),
-      registerModelTools(this.ctx),
-      registerAccountTools(this.ctx),
-      registerVisionTools(this.ctx),
-      registerContextTools(this.ctx),
-      registerCodeTools(this.ctx),
-      registerAnalysisTools(this.ctx),
-      registerBudgetTools(this.ctx),
-      registerVerifyTools(this.ctx),
-    ];
+    const { allToolModules, resourceModule, promptModule } = registerDomainModules(this.ctx);
 
     const enabledTools: any[] = [];
     const enabledHandlers: Record<string, Function> = {};
     const disabledToolNames: string[] = [];
 
-    for (const mod of allModules) {
+    for (const mod of allToolModules) {
       for (const tool of mod.tools) {
         const isEnabled = config[tool.name] !== false;
         if (isEnabled) {
@@ -165,6 +158,24 @@ class OpenRouterServer {
         return await handler(request.params.arguments);
       }
       throw new McpError(ErrorCode.MethodNotFound, `Unknown tool or tool disabled: ${request.params.name}`);
+    });
+
+    // Register MCP Resources
+    this.server.setRequestHandler(ListResourcesRequestSchema, async () => ({
+      resources: resourceModule.resources,
+    }));
+
+    this.server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
+      return await resourceModule.readResource(request.params.uri);
+    });
+
+    // Register MCP Prompts
+    this.server.setRequestHandler(ListPromptsRequestSchema, async () => ({
+      prompts: promptModule.prompts,
+    }));
+
+    this.server.setRequestHandler(GetPromptRequestSchema, async (request) => {
+      return await promptModule.getPrompt(request.params.name, request.params.arguments as any);
     });
   }
 

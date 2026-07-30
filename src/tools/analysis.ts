@@ -16,6 +16,51 @@ import fs from "fs/promises";
 import path from "path";
 import semver from "semver";
 
+export function parseYarnLockfile(content: string): Map<string, { version: string; paths: string[][] }> {
+  const resolved = new Map<string, { version: string; paths: string[][] }>();
+  const blocks = content.split("\n\n");
+  for (const block of blocks) {
+    const headerMatch = block.match(/^"?([@a-zA-Z0-9_.-]+(?:\/[@a-zA-Z0-9_.-]+)?|[a-zA-Z0-9_.-]+)@/m);
+    const versionMatch = block.match(/version\s+"([^"]+)"/);
+    if (headerMatch && versionMatch) {
+      const name = headerMatch[1];
+      const version = versionMatch[1];
+      if (name && version && !resolved.has(name)) {
+        resolved.set(name, { version, paths: [[name]] });
+      }
+    }
+  }
+  return resolved;
+}
+
+export function parsePnpmLockfile(content: string): Map<string, { version: string; paths: string[][] }> {
+  const resolved = new Map<string, { version: string; paths: string[][] }>();
+  const lines = content.split("\n");
+  let inPackages = false;
+  for (const line of lines) {
+    if (line.startsWith("packages:")) {
+      inPackages = true;
+      continue;
+    }
+    if (inPackages && line && !line.startsWith(" ") && !line.startsWith("  ")) {
+      if (!line.startsWith("importers:") && !line.startsWith("snapshots:")) {
+        inPackages = false;
+      }
+    }
+    if (inPackages) {
+      const match = line.match(/^\s{2}['"]?\/?([@a-zA-Z0-9_.-]+(?:\/[@a-zA-Z0-9_.-]+)?)[@/]([0-9]+\.[0-9]+\.[0-9]+[^:'"]*)['"]?:/);
+      if (match) {
+        const name = match[1];
+        const version = match[2];
+        if (name && version && !resolved.has(name)) {
+          resolved.set(name, { version, paths: [[name]] });
+        }
+      }
+    }
+  }
+  return resolved;
+}
+
 export function registerAnalysisTools(ctx: ServerContext) {
   const tools = [
     {
@@ -307,14 +352,8 @@ export function registerAnalysisTools(ctx: ServerContext) {
             isTransitiveResolved = true;
           } catch {
             try {
-              const lockfileContent = await fs.readFile(path.join(repoPath, "Cargo.lock"), "utf-8");
-              let rootCandidates: string[] = [];
-              try {
-                const cargoToml = parseCargoToml(await fs.readFile(path.join(repoPath, "Cargo.toml"), "utf-8"));
-                if (cargoToml.name) rootCandidates.push(cargoToml.name);
-              } catch {}
-
-              const parsed = resolveCargoTransitive(lockfileContent, rootCandidates, max_depth);
+              const lockfileContent = await fs.readFile(path.join(repoPath, "yarn.lock"), "utf-8");
+              const parsed = parseYarnLockfile(lockfileContent);
               for (const [pkgName, pkgInfo] of parsed.entries()) {
                 if (!resolvedPackageMap.has(pkgName)) {
                   resolvedPackageMap.set(pkgName, []);
@@ -325,16 +364,66 @@ export function registerAnalysisTools(ctx: ServerContext) {
                   paths: pkgInfo.paths
                 });
               }
-
               repoInfoMap[repoName] = { 
-                type: "cargo (lockfile)", 
+                type: "yarn (lockfile)", 
                 displayName: repoName, 
                 depCount: parsed.size,
                 transitiveCount: parsed.size
               };
               isTransitiveResolved = true;
             } catch {
-              warnings.push(`Could not locate or parse lockfile in repository "${repoName}". Falling back to first-level manifest checking.`);
+              try {
+                const lockfileContent = await fs.readFile(path.join(repoPath, "pnpm-lock.yaml"), "utf-8");
+                const parsed = parsePnpmLockfile(lockfileContent);
+                for (const [pkgName, pkgInfo] of parsed.entries()) {
+                  if (!resolvedPackageMap.has(pkgName)) {
+                    resolvedPackageMap.set(pkgName, []);
+                  }
+                  resolvedPackageMap.get(pkgName)!.push({
+                    repo: repoName,
+                    version: pkgInfo.version,
+                    paths: pkgInfo.paths
+                  });
+                }
+                repoInfoMap[repoName] = { 
+                  type: "pnpm (lockfile)", 
+                  displayName: repoName, 
+                  depCount: parsed.size,
+                  transitiveCount: parsed.size
+                };
+                isTransitiveResolved = true;
+              } catch {
+                try {
+                  const lockfileContent = await fs.readFile(path.join(repoPath, "Cargo.lock"), "utf-8");
+                  let rootCandidates: string[] = [];
+                  try {
+                    const cargoToml = parseCargoToml(await fs.readFile(path.join(repoPath, "Cargo.toml"), "utf-8"));
+                    if (cargoToml.name) rootCandidates.push(cargoToml.name);
+                  } catch {}
+
+                  const parsed = resolveCargoTransitive(lockfileContent, rootCandidates, max_depth);
+                  for (const [pkgName, pkgInfo] of parsed.entries()) {
+                    if (!resolvedPackageMap.has(pkgName)) {
+                      resolvedPackageMap.set(pkgName, []);
+                    }
+                    resolvedPackageMap.get(pkgName)!.push({
+                      repo: repoName,
+                      version: pkgInfo.version,
+                      paths: pkgInfo.paths
+                    });
+                  }
+
+                  repoInfoMap[repoName] = { 
+                    type: "cargo (lockfile)", 
+                    displayName: repoName, 
+                    depCount: parsed.size,
+                    transitiveCount: parsed.size
+                  };
+                  isTransitiveResolved = true;
+                } catch {
+                  warnings.push(`Could not locate or parse lockfile in repository "${repoName}". Falling back to first-level manifest checking.`);
+                }
+              }
             }
           }
         }

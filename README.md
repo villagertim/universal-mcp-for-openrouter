@@ -11,8 +11,10 @@ Now fully modularized and config-driven for maximum flexibility.
 The server follows a **Domain-Specific Modular Architecture**:
 
 - **Server Core**: Lightweight orchestrator in `src/index.ts`.
-- **Domain Modules**: Specialized toolsets in `src/tools/` (Chat, Models, Context, Code, etc.).
-- **Shared Helpers**: Centralized infrastructure in `src/helpers/` (Rate limiting, Pricing, Embeddings).
+- **Domain Orchestrator**: Namespace capability loader in `src/domains/index.ts` (Gateway, Intelligence, Diagnostics).
+- **Domain Tool Modules**: Specialized toolsets in `src/tools/` (Chat, Models, Context, Code, etc.).
+- **Native MCP Primitives**: Standard MCP Resources (`src/resources/`) and Prompts (`src/prompts/`).
+- **Shared Helpers**: Centralized infrastructure in `src/helpers/` (Rate limiting, Pricing, Embeddings, Firewall).
 
 ---
 
@@ -85,13 +87,19 @@ In your `mcp_config.json`:
 > 
 > Use OpenRouter's native limits to protect your wallet, and use the Universal MCP's budget tools to manage your agent's behavior.
 
-### 🛡️ Secret Redaction Firewall
-The server includes a built-in, local **Secret Redaction Firewall** that automatically intercepts prompts and embeddings to scan and redact:
-* OpenRouter API keys (`sk-or-v1-...`)
-* OpenAI API keys (`sk-proj-...`)
-* Private PEM key blocks (`-----BEGIN ... KEY-----`)
+### 🛡️ Secret Redaction & Prompt Injection Firewall
+The server includes a built-in, local **Security Firewall** in `src/helpers/rate-guard.ts` (`sanitizeInputPrompt`) that automatically intercepts prompts and embeddings payloads to:
+* **Redact API Keys & Credentials:**
+  - OpenRouter API keys (`sk-or-v1-...`)
+  - OpenAI API keys (`sk-proj-...`)
+  - Anthropic API keys (`sk-ant-api...`)
+  - GitHub Personal Access Tokens (`ghp_...` and `github_pat_...`)
+  - AWS Access Key IDs (`AKIA...`)
+  - Google Cloud / OAuth Tokens (`ya29....`)
+  - Multi-line SSH & PEM private key blocks (`-----BEGIN ... KEY-----`)
+* **Sanitize Prompt Injection Delimiters:** Strips or replaces context poisoning markers (`<|im_start|>system`, `[SYSTEM_INSTRUCTION_OVERRIDE]`) to prevent external prompt injection exploits.
 
-This prevents accidental exposure of credentials to external network suppliers. If you explicitly need to transmit credentials for testing or key rotation workflows, you can set the environment variable `DISABLE_REDACTION=true` to bypass the firewall.
+This prevents accidental exposure of credentials to external network suppliers and protects against context poisoning. If you explicitly need to transmit raw credentials for testing or key rotation workflows, set `DISABLE_REDACTION=true`.
 
 ---
 
@@ -123,12 +131,12 @@ set_budget(max_dollars: 5.00, warn_at_percent: 75)
 get_budget_status()
 ```
 
-The budget cap is enforced **before** each API call fires. Configuration survives server restarts (`rate_config.json`). Circuit breakers open automatically after 3 consecutive failures on a model and reset after 60 seconds.
+The budget cap is enforced **before** each API call fires. Configuration survives server restarts (`rate_config.json`). Circuit breakers open automatically after failures, parsing HTTP `Retry-After` response headers (on 429 rate limits) or applying adaptive exponential backoff (5s ➔ 10s ➔ 20s ➔ 40s ➔ 60s max) so healthy models recover as soon as rate limits clear.
 
 ### Semantic Code Search (incremental background watch indexing)
 
 ```
-# Step 1 — index the project (spins up real-time background file watchers)
+# Step 1 — index the project (spins up background watchers with automatic build/cache directory pruning)
 index_project(project_path: "/path/to/repo", project_name: "my-api")
 
 # Step 2 — embed code chunks (uses MD5 checks to execute cost-free incremental reindexing)
@@ -167,6 +175,25 @@ correlate_errors(logs: [
   { system_name: "Database Server", content: "WARN: Connection pool exhausted (100/100)" }
 ])
 ```
+
+### 🌐 Native MCP Resources (`openrouter://...`)
+
+Passive read-only state endpoints exposed directly as standard MCP Resources:
+
+- `openrouter://models` — Cached model catalog, context limits, and token pricing rates.
+- `openrouter://budget/status` — Real-time spend metrics, budget caps, and circuit breaker status.
+- `openrouter://account/balance` — Credit balance and API key details.
+- `openrouter://memory/all` — Pinned semantic context notes and workspace memory.
+
+### 📝 Native MCP Prompts (`list_prompts` / `get_prompt`)
+
+Structured system prompt templates discoverable via the MCP `prompts` capability:
+
+- `cost-aware-orchestration` — Teaches agents budget-safe model selection and credit checks.
+- `multi-model-consensus` — Configures parallel peer review workflows.
+- `autonomous-budget-safety` — Financial circuit breaker policy for autonomous loops.
+- `distributed-diagnostics` — Multi-service log correlation and trace isolation.
+- `workspace-memory-pinning` — Workspace memory and architectural decision pinning.
 
 ------
 
