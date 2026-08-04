@@ -14,3 +14,7 @@
 ## 3. Communication & Transparency
 - Keep responses concise, direct, and transparent.
 - Clearly state proposed changes, target files, and risks when presenting plans for approval.
+
+## 4. Implementation Plan Requirement
+- Whenever asked to create an implementation plan, the plan MUST be written to a file in the workspace (e.g. `PLAN_*.md`) for review before any work begins.
+- During the review process, any changes or adjustments to the plan MUST be captured in that same file so the final approved version is always reflected on disk.
